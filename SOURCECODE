@@ -1,0 +1,2312 @@
+"""
+ONEdraft™
+AI-Native Architectural, Engineering & Construction Drafting Platform
+======================================================================
+
+Canonical Core Implementation
+Version: 0.1.0
+
+This file implements the foundational OneDraft™ project engine:
+
+    Organization
+    User
+    Project
+    Requirement
+    Site
+    Building
+    Level
+    Grid
+    Space
+    Element
+    Assembly
+    Parameter
+    Constraint
+    Relationship
+    GeometryReference
+    ModelVersion
+    Revision
+    ChangeRecord
+    AriaCommand
+    DesignProposal
+    View
+    Drawing
+    Sheet
+    SheetTemplate
+    Dimension
+    Annotation
+    Schedule
+    Redline
+    RedlineResolution
+    CodeSource
+    CodeRule
+    CodeCheck
+
+It also implements:
+
+    Canonical Project Model
+    Natural-language command intake
+    Aria command processing
+    Transactional model changes
+    Validation
+    Revision history
+    Change records
+    Code-rule evaluation
+    Drawing generation
+    Schedule generation
+    JSON persistence
+    REST API
+
+Dependencies:
+    Python 3.11+
+    FastAPI
+    Uvicorn
+    Pydantic
+
+Run:
+    pip install fastapi uvicorn pydantic
+    python onedraft.py
+
+API:
+    http://127.0.0.1:8000
+    http://127.0.0.1:8000/docs
+"""
+
+from __future__ import annotations
+
+import copy
+import json
+import math
+import re
+import uuid
+from dataclasses import asdict, dataclass, field
+from datetime import datetime, timezone
+from enum import Enum
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
+
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel, Field
+
+
+# ============================================================================
+# CORE UTILITIES
+# ============================================================================
+
+def uid(prefix: str) -> str:
+    return f"{prefix}_{uuid.uuid4().hex[:12]}"
+
+
+def utc_now() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
+class Store:
+    """
+    Simple JSON persistence layer.
+
+    Production implementation should replace this with PostgreSQL,
+    event storage, object storage, and transactional persistence.
+    """
+
+    def __init__(self, path: str = "onedraft_data.json"):
+        self.path = Path(path)
+
+    def save(self, project: "Project") -> None:
+        payload = project.to_dict()
+        self.path.write_text(
+            json.dumps(payload, indent=2),
+            encoding="utf-8"
+        )
+
+    def load(self) -> Optional["Project"]:
+        if not self.path.exists():
+            return None
+
+        payload = json.loads(
+            self.path.read_text(encoding="utf-8")
+        )
+
+        return Project.from_dict(payload)
+
+
+# ============================================================================
+# ENUMERATIONS
+# ============================================================================
+
+class ElementType(str, Enum):
+    WALL = "wall"
+    DOOR = "door"
+    WINDOW = "window"
+    COLUMN = "column"
+    BEAM = "beam"
+    SLAB = "slab"
+    ROOF = "roof"
+    STAIR = "stair"
+    RAMP = "ramp"
+    FURNITURE = "furniture"
+    EQUIPMENT = "equipment"
+    FIXTURE = "fixture"
+    GENERIC = "generic"
+
+
+class RelationshipType(str, Enum):
+    CONTAINS = "contains"
+    HOSTED_BY = "hosted_by"
+    CONNECTS_TO = "connects_to"
+    ADJACENT_TO = "adjacent_to"
+    SUPPORTS = "supports"
+    REFERENCES = "references"
+    DEPENDS_ON = "depends_on"
+    ALIGNED_WITH = "aligned_with"
+    INTERSECTS = "intersects"
+
+
+class RevisionStatus(str, Enum):
+    DRAFT = "draft"
+    ISSUED = "issued"
+    SUPERSEDED = "superseded"
+
+
+class CodeSeverity(str, Enum):
+    INFO = "info"
+    WARNING = "warning"
+    ERROR = "error"
+
+
+# ============================================================================
+# GEOMETRY
+# ============================================================================
+
+@dataclass
+class Point:
+    x: float
+    y: float
+    z: float = 0.0
+
+
+@dataclass
+class BoundingBox:
+    min_x: float
+    min_y: float
+    min_z: float
+    max_x: float
+    max_y: float
+    max_z: float
+
+    @property
+    def width(self) -> float:
+        return self.max_x - self.min_x
+
+    @property
+    def depth(self) -> float:
+        return self.max_y - self.min_y
+
+    @property
+    def height(self) -> float:
+        return self.max_z - self.min_z
+
+    @property
+    def area(self) -> float:
+        return max(0.0, self.width * self.depth)
+
+    @property
+    def volume(self) -> float:
+        return self.area * max(0.0, self.height)
+
+
+@dataclass
+class GeometryReference:
+    id: str = field(default_factory=lambda: uid("geom"))
+    geometry_type: str = "box"
+    points: List[Point] = field(default_factory=list)
+    bounding_box: Optional[BoundingBox] = None
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+    def calculate_bounds(self) -> None:
+        if not self.points:
+            return
+
+        xs = [p.x for p in self.points]
+        ys = [p.y for p in self.points]
+        zs = [p.z for p in self.points]
+
+        self.bounding_box = BoundingBox(
+            min_x=min(xs),
+            min_y=min(ys),
+            min_z=min(zs),
+            max_x=max(xs),
+            max_y=max(ys),
+            max_z=max(zs),
+        )
+
+
+def rectangle_geometry(
+    x: float,
+    y: float,
+    width: float,
+    depth: float,
+    z: float = 0.0,
+    height: float = 3.0
+) -> GeometryReference:
+
+    points = [
+        Point(x, y, z),
+        Point(x + width, y, z),
+        Point(x + width, y + depth, z),
+        Point(x, y + depth, z),
+        Point(x, y, z + height),
+        Point(x + width, y, z + height),
+        Point(x + width, y + depth, z + height),
+        Point(x, y + depth, z + height),
+    ]
+
+    geometry = GeometryReference(
+        geometry_type="box",
+        points=points
+    )
+
+    geometry.calculate_bounds()
+    return geometry
+
+
+# ============================================================================
+# DOMAIN ENTITIES
+# ============================================================================
+
+@dataclass
+class Organization:
+    id: str
+    name: str
+
+
+@dataclass
+class User:
+    id: str
+    name: str
+    email: str
+
+
+@dataclass
+class Requirement:
+    id: str
+    project_id: str
+    title: str
+    description: str
+    priority: str = "normal"
+    status: str = "open"
+
+
+@dataclass
+class Site:
+    id: str
+    project_id: str
+    name: str
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    address: Optional[str] = None
+
+
+@dataclass
+class Building:
+    id: str
+    project_id: str
+    site_id: str
+    name: str
+    occupancy: Optional[str] = None
+
+
+@dataclass
+class Level:
+    id: str
+    building_id: str
+    name: str
+    elevation: float
+    height: float = 3.0
+
+
+@dataclass
+class Grid:
+    id: str
+    building_id: str
+    name: str
+    axis: str
+    position: float
+
+
+@dataclass
+class Space:
+    id: str
+    level_id: str
+    name: str
+    number: str
+    area: float = 0.0
+    occupancy: Optional[str] = None
+    geometry_id: Optional[str] = None
+
+
+@dataclass
+class Element:
+    id: str
+    level_id: str
+    element_type: ElementType
+    name: str
+    geometry_id: Optional[str] = None
+    assembly_id: Optional[str] = None
+    parameters: Dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass
+class Assembly:
+    id: str
+    name: str
+    category: str
+    description: str = ""
+    parameters: Dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass
+class Parameter:
+    id: str
+    owner_id: str
+    name: str
+    value: Any
+    data_type: str = "string"
+    unit: Optional[str] = None
+
+
+@dataclass
+class Constraint:
+    id: str
+    project_id: str
+    name: str
+    expression: str
+    severity: CodeSeverity = CodeSeverity.ERROR
+    enabled: bool = True
+
+
+@dataclass
+class Relationship:
+    id: str
+    source_id: str
+    target_id: str
+    relationship_type: RelationshipType
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass
+class ModelVersion:
+    id: str
+    project_id: str
+    number: int
+    created_at: str
+    created_by: str
+    description: str
+    snapshot: Dict[str, Any]
+
+
+@dataclass
+class ChangeRecord:
+    id: str
+    project_id: str
+    revision_id: Optional[str]
+    entity_type: str
+    entity_id: str
+    action: str
+    before: Optional[Dict[str, Any]]
+    after: Optional[Dict[str, Any]]
+    created_at: str
+    created_by: str
+
+
+@dataclass
+class Revision:
+    id: str
+    project_id: str
+    number: int
+    title: str
+    description: str
+    status: RevisionStatus
+    created_at: str
+    created_by: str
+    change_record_ids: List[str] = field(default_factory=list)
+
+
+@dataclass
+class AriaCommand:
+    id: str
+    project_id: str
+    user_id: str
+    text: str
+    intent: Optional[str]
+    parameters: Dict[str, Any]
+    status: str
+    result: Optional[Dict[str, Any]]
+    created_at: str
+
+
+@dataclass
+class DesignProposal:
+    id: str
+    project_id: str
+    name: str
+    description: str
+    status: str = "draft"
+    changes: List[Dict[str, Any]] = field(default_factory=list)
+    evaluation: Dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass
+class View:
+    id: str
+    project_id: str
+    name: str
+    view_type: str
+    level_id: Optional[str] = None
+    scale: str = "1:100"
+
+
+@dataclass
+class Drawing:
+    id: str
+    project_id: str
+    name: str
+    drawing_type: str
+    view_ids: List[str] = field(default_factory=list)
+    element_ids: List[str] = field(default_factory=list)
+
+
+@dataclass
+class SheetTemplate:
+    id: str
+    name: str
+    width: float
+    height: float
+    title_block: Dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass
+class Sheet:
+    id: str
+    project_id: str
+    number: str
+    name: str
+    template_id: Optional[str] = None
+    drawing_ids: List[str] = field(default_factory=list)
+    revision_ids: List[str] = field(default_factory=list)
+
+
+@dataclass
+class Dimension:
+    id: str
+    drawing_id: str
+    value: float
+    text: Optional[str] = None
+    start: Optional[Point] = None
+    end: Optional[Point] = None
+
+
+@dataclass
+class Annotation:
+    id: str
+    drawing_id: str
+    text: str
+    x: float
+    y: float
+    category: str = "general"
+
+
+@dataclass
+class Schedule:
+    id: str
+    project_id: str
+    name: str
+    category: str
+    columns: List[str]
+    rows: List[Dict[str, Any]] = field(default_factory=list)
+
+
+@dataclass
+class Redline:
+    id: str
+    project_id: str
+    drawing_id: str
+    author: str
+    description: str
+    status: str = "open"
+
+
+@dataclass
+class RedlineResolution:
+    id: str
+    redline_id: str
+    resolved_by: str
+    resolution: str
+    resolved_at: str
+
+
+@dataclass
+class CodeSource:
+    id: str
+    name: str
+    jurisdiction: str
+    edition: str
+    source_uri: Optional[str] = None
+
+
+@dataclass
+class CodeRule:
+    id: str
+    code_source_id: str
+    rule_number: str
+    title: str
+    expression: str
+    severity: CodeSeverity = CodeSeverity.ERROR
+    description: str = ""
+
+
+@dataclass
+class CodeCheck:
+    id: str
+    project_id: str
+    rule_id: str
+    passed: bool
+    message: str
+    evaluated_at: str
+    affected_entity_ids: List[str] = field(default_factory=list)
+
+
+# ============================================================================
+# PROJECT MODEL
+# ============================================================================
+
+@dataclass
+class Project:
+    id: str
+    organization_id: str
+    name: str
+    description: str = ""
+
+    requirements: Dict[str, Requirement] = field(default_factory=dict)
+    sites: Dict[str, Site] = field(default_factory=dict)
+    buildings: Dict[str, Building] = field(default_factory=dict)
+    levels: Dict[str, Level] = field(default_factory=dict)
+    grids: Dict[str, Grid] = field(default_factory=dict)
+    spaces: Dict[str, Space] = field(default_factory=dict)
+    elements: Dict[str, Element] = field(default_factory=dict)
+    assemblies: Dict[str, Assembly] = field(default_factory=dict)
+    parameters: Dict[str, Parameter] = field(default_factory=dict)
+    constraints: Dict[str, Constraint] = field(default_factory=dict)
+    relationships: Dict[str, Relationship] = field(default_factory=dict)
+    geometries: Dict[str, GeometryReference] = field(default_factory=dict)
+
+    model_versions: Dict[str, ModelVersion] = field(default_factory=dict)
+    revisions: Dict[str, Revision] = field(default_factory=dict)
+    change_records: Dict[str, ChangeRecord] = field(default_factory=dict)
+
+    commands: Dict[str, AriaCommand] = field(default_factory=dict)
+    proposals: Dict[str, DesignProposal] = field(default_factory=dict)
+
+    views: Dict[str, View] = field(default_factory=dict)
+    drawings: Dict[str, Drawing] = field(default_factory=dict)
+    sheet_templates: Dict[str, SheetTemplate] = field(default_factory=dict)
+    sheets: Dict[str, Sheet] = field(default_factory=dict)
+
+    dimensions: Dict[str, Dimension] = field(default_factory=dict)
+    annotations: Dict[str, Annotation] = field(default_factory=dict)
+    schedules: Dict[str, Schedule] = field(default_factory=dict)
+
+    redlines: Dict[str, Redline] = field(default_factory=dict)
+    redline_resolutions: Dict[str, RedlineResolution] = field(default_factory=dict)
+
+    code_sources: Dict[str, CodeSource] = field(default_factory=dict)
+    code_rules: Dict[str, CodeRule] = field(default_factory=dict)
+    code_checks: Dict[str, CodeCheck] = field(default_factory=dict)
+
+    current_revision_number: int = 0
+    current_model_version: int = 0
+
+    def to_dict(self) -> Dict[str, Any]:
+        return serialize(self)
+
+    @staticmethod
+    def from_dict(data: Dict[str, Any]) -> "Project":
+        return deserialize_project(data)
+
+
+# ============================================================================
+# SERIALIZATION
+# ============================================================================
+
+def serialize(value: Any) -> Any:
+
+    if isinstance(value, Enum):
+        return value.value
+
+    if isinstance(value, dict):
+        return {
+            str(k): serialize(v)
+            for k, v in value.items()
+        }
+
+    if isinstance(value, list):
+        return [serialize(v) for v in value]
+
+    if hasattr(value, "__dataclass_fields__"):
+        return {
+            k: serialize(getattr(value, k))
+            for k in value.__dataclass_fields__
+        }
+
+    return value
+
+
+def point_from_dict(data: Dict[str, Any]) -> Point:
+    return Point(**data)
+
+
+def geometry_from_dict(data: Dict[str, Any]) -> GeometryReference:
+    data = dict(data)
+    data["points"] = [
+        point_from_dict(p)
+        for p in data.get("points", [])
+    ]
+
+    if data.get("bounding_box"):
+        data["bounding_box"] = BoundingBox(
+            **data["bounding_box"]
+        )
+
+    return GeometryReference(**data)
+
+
+def deserialize_project(data: Dict[str, Any]) -> Project:
+
+    p = Project(
+        id=data["id"],
+        organization_id=data["organization_id"],
+        name=data["name"],
+        description=data.get("description", "")
+    )
+
+    p.current_revision_number = data.get(
+        "current_revision_number", 0
+    )
+
+    p.current_model_version = data.get(
+        "current_model_version", 0
+    )
+
+    for k, v in data.get("requirements", {}).items():
+        p.requirements[k] = Requirement(**v)
+
+    for k, v in data.get("sites", {}).items():
+        p.sites[k] = Site(**v)
+
+    for k, v in data.get("buildings", {}).items():
+        p.buildings[k] = Building(**v)
+
+    for k, v in data.get("levels", {}).items():
+        p.levels[k] = Level(**v)
+
+    for k, v in data.get("grids", {}).items():
+        p.grids[k] = Grid(**v)
+
+    for k, v in data.get("spaces", {}).items():
+        p.spaces[k] = Space(**v)
+
+    for k, v in data.get("elements", {}).items():
+        v = dict(v)
+        v["element_type"] = ElementType(v["element_type"])
+        p.elements[k] = Element(**v)
+
+    for k, v in data.get("assemblies", {}).items():
+        p.assemblies[k] = Assembly(**v)
+
+    for k, v in data.get("parameters", {}).items():
+        p.parameters[k] = Parameter(**v)
+
+    for k, v in data.get("constraints", {}).items():
+        v = dict(v)
+        v["severity"] = CodeSeverity(v["severity"])
+        p.constraints[k] = Constraint(**v)
+
+    for k, v in data.get("relationships", {}).items():
+        v = dict(v)
+        v["relationship_type"] = RelationshipType(
+            v["relationship_type"]
+        )
+        p.relationships[k] = Relationship(**v)
+
+    for k, v in data.get("geometries", {}).items():
+        p.geometries[k] = geometry_from_dict(v)
+
+    for k, v in data.get("model_versions", {}).items():
+        p.model_versions[k] = ModelVersion(**v)
+
+    for k, v in data.get("revisions", {}).items():
+        v = dict(v)
+        v["status"] = RevisionStatus(v["status"])
+        p.revisions[k] = Revision(**v)
+
+    for k, v in data.get("change_records", {}).items():
+        p.change_records[k] = ChangeRecord(**v)
+
+    for k, v in data.get("commands", {}).items():
+        p.commands[k] = AriaCommand(**v)
+
+    for k, v in data.get("proposals", {}).items():
+        p.proposals[k] = DesignProposal(**v)
+
+    for k, v in data.get("views", {}).items():
+        p.views[k] = View(**v)
+
+    for k, v in data.get("drawings", {}).items():
+        p.drawings[k] = Drawing(**v)
+
+    for k, v in data.get("sheet_templates", {}).items():
+        p.sheet_templates[k] = SheetTemplate(**v)
+
+    for k, v in data.get("sheets", {}).items():
+        p.sheets[k] = Sheet(**v)
+
+    for k, v in data.get("dimensions", {}).items():
+        v = dict(v)
+
+        if v.get("start"):
+            v["start"] = Point(**v["start"])
+
+        if v.get("end"):
+            v["end"] = Point(**v["end"])
+
+        p.dimensions[k] = Dimension(**v)
+
+    for k, v in data.get("annotations", {}).items():
+        p.annotations[k] = Annotation(**v)
+
+    for k, v in data.get("schedules", {}).items():
+        p.schedules[k] = Schedule(**v)
+
+    for k, v in data.get("redlines", {}).items():
+        p.redlines[k] = Redline(**v)
+
+    for k, v in data.get("redline_resolutions", {}).items():
+        p.redline_resolutions[k] = RedlineResolution(**v)
+
+    for k, v in data.get("code_sources", {}).items():
+        p.code_sources[k] = CodeSource(**v)
+
+    for k, v in data.get("code_rules", {}).items():
+        v = dict(v)
+        v["severity"] = CodeSeverity(v["severity"])
+        p.code_rules[k] = CodeRule(**v)
+
+    for k, v in data.get("code_checks", {}).items():
+        p.code_checks[k] = CodeCheck(**v)
+
+    return p
+
+
+# ============================================================================
+# MODEL ENGINE
+# ============================================================================
+
+class ModelEngine:
+
+    def __init__(
+        self,
+        project: Project,
+        store: Optional[Store] = None
+    ):
+        self.project = project
+        self.store = store
+
+    def save(self) -> None:
+        if self.store:
+            self.store.save(self.project)
+
+    def snapshot(self) -> Dict[str, Any]:
+        return copy.deepcopy(
+            serialize(self.project)
+        )
+
+    def create_revision(
+        self,
+        user_id: str,
+        title: str,
+        description: str
+    ) -> Revision:
+
+        self.project.current_revision_number += 1
+
+        revision = Revision(
+            id=uid("rev"),
+            project_id=self.project.id,
+            number=self.project.current_revision_number,
+            title=title,
+            description=description,
+            status=RevisionStatus.DRAFT,
+            created_at=utc_now(),
+            created_by=user_id
+        )
+
+        self.project.revisions[revision.id] = revision
+
+        return revision
+
+    def create_model_version(
+        self,
+        user_id: str,
+        description: str
+    ) -> ModelVersion:
+
+        self.project.current_model_version += 1
+
+        version = ModelVersion(
+            id=uid("model"),
+            project_id=self.project.id,
+            number=self.project.current_model_version,
+            created_at=utc_now(),
+            created_by=user_id,
+            description=description,
+            snapshot=self.snapshot()
+        )
+
+        self.project.model_versions[version.id] = version
+
+        return version
+
+    def record_change(
+        self,
+        user_id: str,
+        revision_id: Optional[str],
+        entity_type: str,
+        entity_id: str,
+        action: str,
+        before: Optional[Any],
+        after: Optional[Any]
+    ) -> ChangeRecord:
+
+        record = ChangeRecord(
+            id=uid("change"),
+            project_id=self.project.id,
+            revision_id=revision_id,
+            entity_type=entity_type,
+            entity_id=entity_id,
+            action=action,
+            before=serialize(before),
+            after=serialize(after),
+            created_at=utc_now(),
+            created_by=user_id
+        )
+
+        self.project.change_records[record.id] = record
+
+        if revision_id and revision_id in self.project.revisions:
+            self.project.revisions[
+                revision_id
+            ].change_record_ids.append(record.id)
+
+        return record
+
+    def add_level(
+        self,
+        building_id: str,
+        name: str,
+        elevation: float,
+        height: float = 3.0,
+        user_id: str = "system",
+        revision_id: Optional[str] = None
+    ) -> Level:
+
+        if building_id not in self.project.buildings:
+            raise ValueError("Building does not exist.")
+
+        level = Level(
+            id=uid("level"),
+            building_id=building_id,
+            name=name,
+            elevation=elevation,
+            height=height
+        )
+
+        self.project.levels[level.id] = level
+
+        self.record_change(
+            user_id,
+            revision_id,
+            "Level",
+            level.id,
+            "create",
+            None,
+            level
+        )
+
+        self.save()
+        return level
+
+    def add_space(
+        self,
+        level_id: str,
+        name: str,
+        number: str,
+        width: float,
+        depth: float,
+        user_id: str = "system",
+        revision_id: Optional[str] = None
+    ) -> Space:
+
+        if level_id not in self.project.levels:
+            raise ValueError("Level does not exist.")
+
+        level = self.project.levels[level_id]
+
+        geometry = rectangle_geometry(
+            0,
+            0,
+            width,
+            depth,
+            level.elevation,
+            level.height
+        )
+
+        self.project.geometries[
+            geometry.id
+        ] = geometry
+
+        space = Space(
+            id=uid("space"),
+            level_id=level_id,
+            name=name,
+            number=number,
+            area=width * depth,
+            geometry_id=geometry.id
+        )
+
+        self.project.spaces[space.id] = space
+
+        self.record_change(
+            user_id,
+            revision_id,
+            "Space",
+            space.id,
+            "create",
+            None,
+            space
+        )
+
+        self.save()
+        return space
+
+    def add_element(
+        self,
+        level_id: str,
+        element_type: ElementType,
+        name: str,
+        x: float,
+        y: float,
+        width: float,
+        depth: float,
+        height: float = 3.0,
+        user_id: str = "system",
+        revision_id: Optional[str] = None
+    ) -> Element:
+
+        if level_id not in self.project.levels:
+            raise ValueError("Level does not exist.")
+
+        level = self.project.levels[level_id]
+
+        geometry = rectangle_geometry(
+            x,
+            y,
+            width,
+            depth,
+            level.elevation,
+            height
+        )
+
+        self.project.geometries[
+            geometry.id
+        ] = geometry
+
+        element = Element(
+            id=uid("element"),
+            level_id=level_id,
+            element_type=element_type,
+            name=name,
+            geometry_id=geometry.id,
+            parameters={
+                "width": width,
+                "depth": depth,
+                "height": height
+            }
+        )
+
+        self.project.elements[element.id] = element
+
+        self.record_change(
+            user_id,
+            revision_id,
+            "Element",
+            element.id,
+            "create",
+            None,
+            element
+        )
+
+        self.save()
+        return element
+
+    def add_relationship(
+        self,
+        source_id: str,
+        target_id: str,
+        relationship_type: RelationshipType,
+        metadata: Optional[Dict[str, Any]] = None,
+        user_id: str = "system",
+        revision_id: Optional[str] = None
+    ) -> Relationship:
+
+        relationship = Relationship(
+            id=uid("rel"),
+            source_id=source_id,
+            target_id=target_id,
+            relationship_type=relationship_type,
+            metadata=metadata or {}
+        )
+
+        self.project.relationships[
+            relationship.id
+        ] = relationship
+
+        self.record_change(
+            user_id,
+            revision_id,
+            "Relationship",
+            relationship.id,
+            "create",
+            None,
+            relationship
+        )
+
+        self.save()
+        return relationship
+
+
+# ============================================================================
+# COMMAND INTERPRETER
+# ============================================================================
+
+class CommandInterpreter:
+
+    def __init__(
+        self,
+        engine: ModelEngine,
+        user_id: str = "system"
+    ):
+        self.engine = engine
+        self.user_id = user_id
+
+    def parse(self, text: str) -> Tuple[str, Dict[str, Any]]:
+
+        normalized = text.strip().lower()
+
+        patterns = [
+            (
+                r"create\s+(?:a\s+)?level\s+(.+?)\s+at\s+(-?\d+(?:\.\d+)?)",
+                "create_level"
+            ),
+            (
+                r"add\s+(?:a\s+)?space\s+(.+?)\s+(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)",
+                "create_space"
+            ),
+            (
+                r"add\s+(?:a\s+)?wall\s+(.+?)\s+(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)",
+                "create_wall"
+            ),
+            (
+                r"create\s+(?:a\s+)?drawing\s+(.+)",
+                "create_drawing"
+            ),
+            (
+                r"create\s+(?:a\s+)?floor\s+plan",
+                "create_floor_plan"
+            ),
+            (
+                r"run\s+(?:a\s+)?code\s+check",
+                "code_check"
+            ),
+            (
+                r"create\s+(?:a\s+)?schedule",
+                "create_schedule"
+            )
+        ]
+
+        for pattern, intent in patterns:
+            match = re.search(pattern, normalized)
+
+            if match:
+                return intent, {
+                    "groups": match.groups()
+                }
+
+        return "unknown", {}
+
+    def execute(
+        self,
+        text: str,
+        revision_id: Optional[str] = None
+    ) -> AriaCommand:
+
+        intent, params = self.parse(text)
+
+        command = AriaCommand(
+            id=uid("aria"),
+            project_id=self.engine.project.id,
+            user_id=self.user_id,
+            text=text,
+            intent=intent,
+            parameters=params,
+            status="processing",
+            result=None,
+            created_at=utc_now()
+        )
+
+        self.engine.project.commands[
+            command.id
+        ] = command
+
+        try:
+
+            if intent == "create_level":
+
+                groups = params["groups"]
+
+                if not self.engine.project.buildings:
+                    raise ValueError(
+                        "Create a building before creating levels."
+                    )
+
+                building = next(
+                    iter(self.engine.project.buildings.values())
+                )
+
+                name = groups[0]
+                elevation = float(groups[1])
+
+                level = self.engine.add_level(
+                    building.id,
+                    name,
+                    elevation,
+                    user_id=self.user_id,
+                    revision_id=revision_id
+                )
+
+                command.result = serialize(level)
+
+            elif intent == "create_space":
+
+                groups = params["groups"]
+
+                if not self.engine.project.levels:
+                    raise ValueError(
+                        "Create a level before creating spaces."
+                    )
+
+                level = next(
+                    iter(self.engine.project.levels.values())
+                )
+
+                name = groups[0]
+                width = float(groups[1])
+                depth = float(groups[2])
+
+                space = self.engine.add_space(
+                    level.id,
+                    name,
+                    str(len(self.engine.project.spaces) + 1),
+                    width,
+                    depth,
+                    user_id=self.user_id,
+                    revision_id=revision_id
+                )
+
+                command.result = serialize(space)
+
+            elif intent == "create_wall":
+
+                groups = params["groups"]
+
+                if not self.engine.project.levels:
+                    raise ValueError(
+                        "Create a level before creating walls."
+                    )
+
+                level = next(
+                    iter(self.engine.project.levels.values())
+                )
+
+                name = groups[0]
+                width = float(groups[1])
+                depth = float(groups[2])
+
+                wall = self.engine.add_element(
+                    level.id,
+                    ElementType.WALL,
+                    name,
+                    0,
+                    0,
+                    width,
+                    depth,
+                    user_id=self.user_id,
+                    revision_id=revision_id
+                )
+
+                command.result = serialize(wall)
+
+            elif intent == "create_drawing":
+
+                name = params["groups"][0]
+
+                drawing = Drawing(
+                    id=uid("drawing"),
+                    project_id=self.engine.project.id,
+                    name=name,
+                    drawing_type="general"
+                )
+
+                self.engine.project.drawings[
+                    drawing.id
+                ] = drawing
+
+                command.result = serialize(drawing)
+
+            elif intent == "create_floor_plan":
+
+                drawing = Drawing(
+                    id=uid("drawing"),
+                    project_id=self.engine.project.id,
+                    name="Floor Plan",
+                    drawing_type="floor_plan"
+                )
+
+                if self.engine.project.levels:
+
+                    level = next(
+                        iter(self.engine.project.levels.values())
+                    )
+
+                    view = View(
+                        id=uid("view"),
+                        project_id=self.engine.project.id,
+                        name=f"{level.name} Floor Plan",
+                        view_type="floor_plan",
+                        level_id=level.id
+                    )
+
+                    self.engine.project.views[
+                        view.id
+                    ] = view
+
+                    drawing.view_ids.append(view.id)
+
+                    drawing.element_ids = [
+                        e.id
+                        for e in self.engine.project.elements.values()
+                        if e.level_id == level.id
+                    ]
+
+                self.engine.project.drawings[
+                    drawing.id
+                ] = drawing
+
+                command.result = serialize(drawing)
+
+            elif intent == "code_check":
+
+                results = CodeEngine(
+                    self.engine.project
+                ).run_all()
+
+                command.result = {
+                    "checks": [
+                        serialize(c)
+                        for c in results
+                    ]
+                }
+
+            elif intent == "create_schedule":
+
+                schedule = DocumentationEngine(
+                    self.engine.project
+                ).create_element_schedule()
+
+                command.result = serialize(schedule)
+
+            else:
+
+                command.status = "rejected"
+                command.result = {
+                    "error": "Command intent could not be determined."
+                }
+
+                return command
+
+            command.status = "completed"
+
+        except Exception as exc:
+
+            command.status = "failed"
+            command.result = {
+                "error": str(exc)
+            }
+
+        self.engine.save()
+        return command
+
+
+# ============================================================================
+# VALIDATION ENGINE
+# ============================================================================
+
+class ValidationEngine:
+
+    def __init__(self, project: Project):
+        self.project = project
+
+    def validate(self) -> List[str]:
+
+        errors: List[str] = []
+
+        for space in self.project.spaces.values():
+
+            if space.level_id not in self.project.levels:
+                errors.append(
+                    f"Space {space.id} references missing level."
+                )
+
+            if space.area < 0:
+                errors.append(
+                    f"Space {space.id} has negative area."
+                )
+
+        for element in self.project.elements.values():
+
+            if element.level_id not in self.project.levels:
+                errors.append(
+                    f"Element {element.id} references missing level."
+                )
+
+            if element.geometry_id:
+                if element.geometry_id not in self.project.geometries:
+                    errors.append(
+                        f"Element {element.id} references missing geometry."
+                    )
+
+        for relationship in self.project.relationships.values():
+
+            if not self.entity_exists(
+                relationship.source_id
+            ):
+                errors.append(
+                    f"Relationship {relationship.id} has missing source."
+                )
+
+            if not self.entity_exists(
+                relationship.target_id
+            ):
+                errors.append(
+                    f"Relationship {relationship.id} has missing target."
+                )
+
+        return errors
+
+    def entity_exists(self, entity_id: str) -> bool:
+
+        collections = [
+            self.project.requirements,
+            self.project.sites,
+            self.project.buildings,
+            self.project.levels,
+            self.project.grids,
+            self.project.spaces,
+            self.project.elements,
+            self.project.assemblies,
+            self.project.parameters,
+            self.project.constraints,
+            self.project.relationships
+        ]
+
+        return any(
+            entity_id in collection
+            for collection in collections
+        )
+
+
+# ============================================================================
+# CODE ENGINE
+# ============================================================================
+
+class CodeEngine:
+
+    def __init__(self, project: Project):
+        self.project = project
+
+    def evaluate(
+        self,
+        rule: CodeRule
+    ) -> CodeCheck:
+
+        expression = rule.expression.strip()
+
+        passed = True
+        message = "Rule passed."
+        affected: List[str] = []
+
+        if expression.startswith("MIN_SPACE_AREA"):
+
+            try:
+                minimum = float(
+                    expression.split(">=")[1].strip()
+                )
+
+                for space in self.project.spaces.values():
+
+                    if space.area < minimum:
+
+                        passed = False
+                        affected.append(space.id)
+
+                        message = (
+                            f"Space {space.number} "
+                            f"has area {space.area:.2f}, "
+                            f"below required minimum "
+                            f"{minimum:.2f}."
+                        )
+
+            except Exception:
+                passed = False
+                message = "Invalid MIN_SPACE_AREA expression."
+
+        elif expression.startswith("MIN_LEVEL_HEIGHT"):
+
+            try:
+                minimum = float(
+                    expression.split(">=")[1].strip()
+                )
+
+                for level in self.project.levels.values():
+
+                    if level.height < minimum:
+
+                        passed = False
+                        affected.append(level.id)
+
+                        message = (
+                            f"Level {level.name} has height "
+                            f"{level.height:.2f}, below "
+                            f"minimum {minimum:.2f}."
+                        )
+
+            except Exception:
+                passed = False
+                message = "Invalid MIN_LEVEL_HEIGHT expression."
+
+        else:
+
+            message = (
+                "Rule expression registered but no evaluator "
+                "has been implemented for this rule type."
+            )
+
+        check = CodeCheck(
+            id=uid("check"),
+            project_id=self.project.id,
+            rule_id=rule.id,
+            passed=passed,
+            message=message,
+            evaluated_at=utc_now(),
+            affected_entity_ids=affected
+        )
+
+        self.project.code_checks[
+            check.id
+        ] = check
+
+        return check
+
+    def run_all(self) -> List[CodeCheck]:
+
+        results = []
+
+        for rule in self.project.code_rules.values():
+            results.append(
+                self.evaluate(rule)
+            )
+
+        return results
+
+
+# ============================================================================
+# DOCUMENTATION ENGINE
+# ============================================================================
+
+class DocumentationEngine:
+
+    def __init__(self, project: Project):
+        self.project = project
+
+    def create_element_schedule(self) -> Schedule:
+
+        rows = []
+
+        for element in self.project.elements.values():
+
+            geometry = None
+
+            if element.geometry_id:
+                geometry = self.project.geometries.get(
+                    element.geometry_id
+                )
+
+            row = {
+                "id": element.id,
+                "name": element.name,
+                "type": element.element_type.value,
+                "level_id": element.level_id,
+                "assembly_id": element.assembly_id
+            }
+
+            if geometry and geometry.bounding_box:
+
+                row.update({
+                    "width": geometry.bounding_box.width,
+                    "depth": geometry.bounding_box.depth,
+                    "height": geometry.bounding_box.height
+                })
+
+            rows.append(row)
+
+        schedule = Schedule(
+            id=uid("schedule"),
+            project_id=self.project.id,
+            name="Element Schedule",
+            category="elements",
+            columns=[
+                "id",
+                "name",
+                "type",
+                "level_id",
+                "assembly_id",
+                "width",
+                "depth",
+                "height"
+            ],
+            rows=rows
+        )
+
+        self.project.schedules[
+            schedule.id
+        ] = schedule
+
+        return schedule
+
+    def create_space_schedule(self) -> Schedule:
+
+        rows = [
+            {
+                "number": s.number,
+                "name": s.name,
+                "level_id": s.level_id,
+                "area": s.area,
+                "occupancy": s.occupancy
+            }
+            for s in self.project.spaces.values()
+        ]
+
+        schedule = Schedule(
+            id=uid("schedule"),
+            project_id=self.project.id,
+            name="Room / Space Schedule",
+            category="spaces",
+            columns=[
+                "number",
+                "name",
+                "level_id",
+                "area",
+                "occupancy"
+            ],
+            rows=rows
+        )
+
+        self.project.schedules[
+            schedule.id
+        ] = schedule
+
+        return schedule
+
+
+# ============================================================================
+# DRAWING ENGINE
+# ============================================================================
+
+class DrawingEngine:
+
+    def __init__(self, project: Project):
+        self.project = project
+
+    def floor_plan(
+        self,
+        level_id: str
+    ) -> Drawing:
+
+        if level_id not in self.project.levels:
+            raise ValueError("Level does not exist.")
+
+        level = self.project.levels[level_id]
+
+        view = View(
+            id=uid("view"),
+            project_id=self.project.id,
+            name=f"{level.name} Plan",
+            view_type="floor_plan",
+            level_id=level_id,
+            scale="1:100"
+        )
+
+        self.project.views[
+            view.id
+        ] = view
+
+        drawing = Drawing(
+            id=uid("drawing"),
+            project_id=self.project.id,
+            name=f"{level.name} Floor Plan",
+            drawing_type="floor_plan",
+            view_ids=[view.id],
+            element_ids=[
+                e.id
+                for e in self.project.elements.values()
+                if e.level_id == level_id
+            ]
+        )
+
+        self.project.drawings[
+            drawing.id
+        ] = drawing
+
+        return drawing
+
+
+# ============================================================================
+# REDLINE ENGINE
+# ============================================================================
+
+class RedlineEngine:
+
+    def __init__(self, project: Project):
+        self.project = project
+
+    def create(
+        self,
+        drawing_id: str,
+        author: str,
+        description: str
+    ) -> Redline:
+
+        if drawing_id not in self.project.drawings:
+            raise ValueError("Drawing does not exist.")
+
+        redline = Redline(
+            id=uid("redline"),
+            project_id=self.project.id,
+            drawing_id=drawing_id,
+            author=author,
+            description=description
+        )
+
+        self.project.redlines[
+            redline.id
+        ] = redline
+
+        return redline
+
+    def resolve(
+        self,
+        redline_id: str,
+        user_id: str,
+        resolution: str
+    ) -> RedlineResolution:
+
+        if redline_id not in self.project.redlines:
+            raise ValueError("Redline does not exist.")
+
+        redline = self.project.redlines[
+            redline_id
+        ]
+
+        redline.status = "resolved"
+
+        result = RedlineResolution(
+            id=uid("resolution"),
+            redline_id=redline_id,
+            resolved_by=user_id,
+            resolution=resolution,
+            resolved_at=utc_now()
+        )
+
+        self.project.redline_resolutions[
+            result.id
+        ] = result
+
+        return result
+
+
+# ============================================================================
+# PROJECT FACTORY
+# ============================================================================
+
+def create_project(
+    organization_name: str,
+    project_name: str,
+    description: str = ""
+) -> Project:
+
+    organization_id = uid("org")
+
+    project = Project(
+        id=uid("project"),
+        organization_id=organization_id,
+        name=project_name,
+        description=description
+    )
+
+    site = Site(
+        id=uid("site"),
+        project_id=project.id,
+        name="Primary Site"
+    )
+
+    project.sites[site.id] = site
+
+    building = Building(
+        id=uid("building"),
+        project_id=project.id,
+        site_id=site.id,
+        name="Building 01"
+    )
+
+    project.buildings[
+        building.id
+    ] = building
+
+    ground = Level(
+        id=uid("level"),
+        building_id=building.id,
+        name="Ground",
+        elevation=0.0,
+        height=3.0
+    )
+
+    project.levels[
+        ground.id
+    ] = ground
+
+    return project
+
+
+# ============================================================================
+# APPLICATION STATE
+# ============================================================================
+
+STORE = Store()
+
+PROJECT = STORE.load()
+
+if PROJECT is None:
+
+    PROJECT = create_project(
+        "OneDraft Organization",
+        "OneDraft Demonstration Project",
+        "Canonical OneDraft project."
+    )
+
+    STORE.save(PROJECT)
+
+ENGINE = ModelEngine(
+    PROJECT,
+    STORE
+)
+
+INTERPRETER = CommandInterpreter(
+    ENGINE,
+    user_id="system"
+)
+
+
+# ============================================================================
+# FASTAPI
+# ============================================================================
+
+app = FastAPI(
+    title="OneDraft™ API",
+    version="0.1.0",
+    description=(
+        "AI-native architectural, engineering, and construction "
+        "drafting and project-intelligence platform."
+    )
+)
+
+
+# ============================================================================
+# REQUEST MODELS
+# ============================================================================
+
+class CommandRequest(BaseModel):
+    text: str
+    user_id: str = "system"
+
+
+class RevisionRequest(BaseModel):
+    title: str
+    description: str = ""
+    user_id: str = "system"
+
+
+class LevelRequest(BaseModel):
+    building_id: str
+    name: str
+    elevation: float
+    height: float = 3.0
+    user_id: str = "system"
+
+
+class SpaceRequest(BaseModel):
+    level_id: str
+    name: str
+    number: str
+    width: float
+    depth: float
+    user_id: str = "system"
+
+
+class ElementRequest(BaseModel):
+    level_id: str
+    element_type: ElementType
+    name: str
+    x: float
+    y: float
+    width: float
+    depth: float
+    height: float = 3.0
+    user_id: str = "system"
+
+
+class CodeSourceRequest(BaseModel):
+    name: str
+    jurisdiction: str
+    edition: str
+    source_uri: Optional[str] = None
+
+
+class CodeRuleRequest(BaseModel):
+    code_source_id: str
+    rule_number: str
+    title: str
+    expression: str
+    severity: CodeSeverity = CodeSeverity.ERROR
+    description: str = ""
+
+
+# ============================================================================
+# API ROUTES
+# ============================================================================
+
+@app.get("/")
+def root():
+
+    return {
+        "application": "OneDraft™",
+        "version": "0.1.0",
+        "status": "operational",
+        "project_id": PROJECT.id,
+        "project": PROJECT.name
+    }
+
+
+@app.get("/api/project")
+def get_project():
+
+    return PROJECT.to_dict()
+
+
+@app.get("/api/model")
+def get_model():
+
+    return {
+        "project_id": PROJECT.id,
+        "requirements": serialize(PROJECT.requirements),
+        "sites": serialize(PROJECT.sites),
+        "buildings": serialize(PROJECT.buildings),
+        "levels": serialize(PROJECT.levels),
+        "grids": serialize(PROJECT.grids),
+        "spaces": serialize(PROJECT.spaces),
+        "elements": serialize(PROJECT.elements),
+        "assemblies": serialize(PROJECT.assemblies),
+        "parameters": serialize(PROJECT.parameters),
+        "constraints": serialize(PROJECT.constraints),
+        "relationships": serialize(PROJECT.relationships),
+        "geometries": serialize(PROJECT.geometries)
+    }
+
+
+@app.post("/api/aria/command")
+def aria_command(request: CommandRequest):
+
+    interpreter = CommandInterpreter(
+        ENGINE,
+        user_id=request.user_id
+    )
+
+    revision = ENGINE.create_revision(
+        request.user_id,
+        "AI Command",
+        request.text
+    )
+
+    command = interpreter.execute(
+        request.text,
+        revision_id=revision.id
+    )
+
+    ENGINE.create_model_version(
+        request.user_id,
+        f"After command {command.id}"
+    )
+
+    return serialize(command)
+
+
+@app.post("/api/revisions")
+def create_revision(request: RevisionRequest):
+
+    revision = ENGINE.create_revision(
+        request.user_id,
+        request.title,
+        request.description
+    )
+
+    ENGINE.save()
+
+    return serialize(revision)
+
+
+@app.post("/api/levels")
+def create_level(request: LevelRequest):
+
+    level = ENGINE.add_level(
+        request.building_id,
+        request.name,
+        request.elevation,
+        request.height,
+        request.user_id
+    )
+
+    return serialize(level)
+
+
+@app.post("/api/spaces")
+def create_space(request: SpaceRequest):
+
+    space = ENGINE.add_space(
+        request.level_id,
+        request.name,
+        request.number,
+        request.width,
+        request.depth,
+        request.user_id
+    )
+
+    return serialize(space)
+
+
+@app.post("/api/elements")
+def create_element(request: ElementRequest):
+
+    element = ENGINE.add_element(
+        request.level_id,
+        request.element_type,
+        request.name,
+        request.x,
+        request.y,
+        request.width,
+        request.depth,
+        request.height,
+        request.user_id
+    )
+
+    return serialize(element)
+
+
+@app.get("/api/drawings")
+def get_drawings():
+
+    return serialize(PROJECT.drawings)
+
+
+@app.post("/api/drawings/floor-plan/{level_id}")
+def create_floor_plan(level_id: str):
+
+    drawing = DrawingEngine(
+        PROJECT
+    ).floor_plan(level_id)
+
+    ENGINE.save()
+
+    return serialize(drawing)
+
+
+@app.get("/api/schedules")
+def get_schedules():
+
+    return serialize(PROJECT.schedules)
+
+
+@app.post("/api/schedules/elements")
+def create_element_schedule():
+
+    schedule = DocumentationEngine(
+        PROJECT
+    ).create_element_schedule()
+
+    ENGINE.save()
+
+    return serialize(schedule)
+
+
+@app.post("/api/schedules/spaces")
+def create_space_schedule():
+
+    schedule = DocumentationEngine(
+        PROJECT
+    ).create_space_schedule()
+
+    ENGINE.save()
+
+    return serialize(schedule)
+
+
+@app.get("/api/validation")
+def validate_project():
+
+    errors = ValidationEngine(
+        PROJECT
+    ).validate()
+
+    return {
+        "valid": len(errors) == 0,
+        "errors": errors
+    }
+
+
+@app.post("/api/model-version")
+def create_model_version(
+    user_id: str = "system"
+):
+
+    version = ENGINE.create_model_version(
+        user_id,
+        "Manual model checkpoint"
+    )
+
+    ENGINE.save()
+
+    return serialize(version)
+
+
+@app.get("/api/revisions")
+def get_revisions():
+
+    return serialize(PROJECT.revisions)
+
+
+@app.get("/api/changes")
+def get_changes():
+
+    return serialize(PROJECT.change_records)
+
+
+@app.get("/api/commands")
+def get_commands():
+
+    return serialize(PROJECT.commands)
+
+
+@app.post("/api/code/sources")
+def create_code_source(
+    request: CodeSourceRequest
+):
+
+    source = CodeSource(
+        id=uid("codesource"),
+        name=request.name,
+        jurisdiction=request.jurisdiction,
+        edition=request.edition,
+        source_uri=request.source_uri
+    )
+
+    PROJECT.code_sources[
+        source.id
+    ] = source
+
+    ENGINE.save()
+
+    return serialize(source)
+
+
+@app.post("/api/code/rules")
+def create_code_rule(
+    request: CodeRuleRequest
+):
+
+    if request.code_source_id not in PROJECT.code_sources:
+        raise HTTPException(
+            status_code=404,
+            detail="Code source does not exist."
+        )
+
+    rule = CodeRule(
+        id=uid("coderule"),
+        code_source_id=request.code_source_id,
+        rule_number=request.rule_number,
+        title=request.title,
+        expression=request.expression,
+        severity=request.severity,
+        description=request.description
+    )
+
+    PROJECT.code_rules[
+        rule.id
+    ] = rule
+
+    ENGINE.save()
+
+    return serialize(rule)
+
+
+@app.post("/api/code/check")
+def run_code_checks():
+
+    results = CodeEngine(
+        PROJECT
+    ).run_all()
+
+    ENGINE.save()
+
+    return {
+        "count": len(results),
+        "checks": serialize(results)
+    }
+
+
+@app.get("/api/code/checks")
+def get_code_checks():
+
+    return serialize(PROJECT.code_checks)
+
+
+@app.post("/api/redlines")
+def create_redline(
+    drawing_id: str,
+    author: str,
+    description: str
+):
+
+    redline = RedlineEngine(
+        PROJECT
+    ).create(
+        drawing_id,
+        author,
+        description
+    )
+
+    ENGINE.save()
+
+    return serialize(redline)
+
+
+@app.post("/api/redlines/{redline_id}/resolve")
+def resolve_redline(
+    redline_id: str,
+    user_id: str,
+    resolution: str
+):
+
+    result = RedlineEngine(
+        PROJECT
+    ).resolve(
+        redline_id,
+        user_id,
+        resolution
+    )
+
+    ENGINE.save()
+
+    return serialize(result)
+
+
+@app.get("/api/redlines")
+def get_redlines():
+
+    return serialize(PROJECT.redlines)
+
+
+@app.get("/api/statistics")
+def statistics():
+
+    return {
+        "project": PROJECT.name,
+        "requirements": len(PROJECT.requirements),
+        "sites": len(PROJECT.sites),
+        "buildings": len(PROJECT.buildings),
+        "levels": len(PROJECT.levels),
+        "grids": len(PROJECT.grids),
+        "spaces": len(PROJECT.spaces),
+        "elements": len(PROJECT.elements),
+        "assemblies": len(PROJECT.assemblies),
+        "parameters": len(PROJECT.parameters),
+        "constraints": len(PROJECT.constraints),
+        "relationships": len(PROJECT.relationships),
+        "geometries": len(PROJECT.geometries),
+        "model_versions": len(PROJECT.model_versions),
+        "revisions": len(PROJECT.revisions),
+        "changes": len(PROJECT.change_records),
+        "aria_commands": len(PROJECT.commands),
+        "design_proposals": len(PROJECT.proposals),
+        "views": len(PROJECT.views),
+        "drawings": len(PROJECT.drawings),
+        "sheets": len(PROJECT.sheets),
+        "dimensions": len(PROJECT.dimensions),
+        "annotations": len(PROJECT.annotations),
+        "schedules": len(PROJECT.schedules),
+        "redlines": len(PROJECT.redlines),
+        "code_sources": len(PROJECT.code_sources),
+        "code_rules": len(PROJECT.code_rules),
+        "code_checks": len(PROJECT.code_checks)
+    }
+
+
+# ============================================================================
+# LOCAL DEVELOPMENT
+# ============================================================================
+
+if __name__ == "__main__":
+
+    import uvicorn
+
+    uvicorn.run(
+        "onedraft:app",
+        host="127.0.0.1",
+        port=8000,
+        reload=True
+    )
