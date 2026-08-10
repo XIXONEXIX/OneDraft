@@ -1,0 +1,1717 @@
+ONEDRAFT
+CAD-AI — Aria Powered
+Backup, Disaster Recovery & Business Continuity
+Version 1.0
+Status: Implementation Specification
+System: OneDraft
+Database: PostgreSQL
+Artifact Storage: Object Storage
+Execution: Runtime Orchestrator + Job & Worker Execution System
+Recovery Model: Transactional, Versioned, Immutable and Reconstructable
+Primary Objective: Preserve the ability to recover OneDraft project state, generated artifacts, operational services and system configuration following hardware failure, software failure, data corruption, security incident, infrastructure loss or regional service interruption.
+
+1. PURPOSE
+The OneDraft Backup, Disaster Recovery & Business Continuity subsystem establishes the mechanisms required to preserve and restore the operational integrity of the OneDraft platform.
+The system must protect:
+Project data
+Project model state
+Revision history
+Geometry references
+Compliance manifests
+Validation results
+Generated drawings
+Document packages
+Audit events
+Identity and authorization state
+Configuration
+Infrastructure state
+Operational metadata
+Recovery must preserve the provenance chain established by the preceding OneDraft architecture.
+The objective is not merely to restore files.
+The objective is to restore a known, internally consistent OneDraft system state.
+
+2. RECOVERY PRINCIPLE
+OneDraft recovery shall operate according to the principle:
+BACKUP
+ ↓
+VERIFY
+ ↓
+DETECT FAILURE
+ ↓
+ISOLATE
+ ↓
+RESTORE
+ ↓
+RECONCILE
+ ↓
+VALIDATE
+ ↓
+RESUME
+A successful database restore without corresponding artifact recovery is not considered a complete recovery.
+Likewise, restored artifacts without their associated model, revision and provenance state are not considered a complete recovery.
+
+3. BUSINESS CONTINUITY OBJECTIVE
+The platform shall maintain continuity of the following core capabilities:
+AUTHENTICATION
+ORGANIZATION ACCESS
+PROJECT ACCESS
+PROJECT MODEL
+REVISION HISTORY
+COMPLIANCE STATE
+VALIDATION STATE
+DRAWING GENERATION
+DOCUMENT GENERATION
+ARTIFACT RETRIEVAL
+ARIA OPERATIONS
+AUDITABILITY
+Non-critical derived services may be restored after the transactional project foundation.
+
+4. RECOVERY DOMAINS
+The recovery architecture shall distinguish:
+DATABASE RECOVERY
+ARTIFACT RECOVERY
+APPLICATION RECOVERY
+WORKER RECOVERY
+QUEUE RECOVERY
+CONFIGURATION RECOVERY
+IDENTITY RECOVERY
+SECRETS RECOVERY
+OBSERVABILITY RECOVERY
+INFRASTRUCTURE RECOVERY
+Each recovery domain shall have an explicit restoration procedure.
+
+5. SYSTEM OF RECOVERY RECORD
+The authoritative recovery state is derived from:
+PostgreSQL
++
+Object Storage
++
+Immutable Audit Records
++
+Configuration Repository
++
+Deployment Definitions
++
+Secrets Recovery Mechanism
+The recovery system must preserve relationships between these components.
+
+6. RECOVERY UNIT
+The fundamental recoverable OneDraft unit is:
+Organization
+ ↓
+Project
+ ↓
+Model Version
+ ↓
+Revision
+ ↓
+Code Manifest
+ ↓
+Validation Run
+ ↓
+Drawing Set
+ ↓
+Document Package
+ ↓
+Acceptance
+A recovery process must preserve these relationships.
+
+7. DATABASE BACKUP
+PostgreSQL shall be backed up using a combination of:
+Continuous WAL archiving
+Periodic full database backups
+Logical backups where required
+Verified restoration snapshots
+The preferred production recovery mechanism shall support point-in-time recovery.
+
+8. DATABASE POINT-IN-TIME RECOVERY
+The production database shall support restoration to a specific timestamp.
+Conceptually:
+FULL BASE BACKUP
++
+WAL ARCHIVE
+=
+POINT-IN-TIME RECOVERY
+The target recovery timestamp shall be recorded during an incident.
+The restored database must be validated before being promoted as authoritative.
+
+9. DATABASE BACKUP FREQUENCY
+The production database shall use:
+Continuous WAL archival
+Daily backup verification
+Regular full database snapshots
+Periodic restoration testing
+Backup frequency may be increased as transaction volume increases.
+
+10. DATABASE BACKUP RETENTION
+The initial retention policy shall distinguish:
+SHORT-TERM OPERATIONAL BACKUPS
+MEDIUM-TERM RECOVERY BACKUPS
+LONG-TERM ARCHIVAL BACKUPS
+Retention periods shall be configurable through the administrative control plane.
+Retention policy must not permit deletion of records that are required for contractual, regulatory, audit or provenance obligations.
+
+11. BACKUP ENCRYPTION
+Production backups shall be encrypted at rest.
+Encryption shall apply to:
+DATABASE BACKUPS
+WAL ARCHIVES
+OBJECT STORAGE BACKUPS
+CONFIGURATION BACKUPS
+RECOVERY EXPORTS
+Encryption keys must not be stored alongside the backup material they protect.
+
+12. BACKUP TRANSPORT SECURITY
+Backup data transmitted between systems shall use encrypted transport.
+Backup channels shall be isolated from ordinary application traffic where practical.
+The backup system must authenticate both source and destination.
+
+13. OBJECT STORAGE BACKUP
+Generated OneDraft artifacts shall be protected independently from PostgreSQL.
+Protected artifact classes include:
+DRAWINGS
+PDF DOCUMENTS
+CAD FILES
+BIM FILES
+IMAGES
+SURVEY DATA
+SOURCE DOCUMENTS
+CODE SOURCE ARTIFACTS
+VALIDATION REPORTS
+EXPORTS
+ARCHIVED PROJECT PACKAGES
+Object storage shall support versioning where available.
+
+14. ARTIFACT VERSION PRESERVATION
+An artifact associated with a finalized revision must not be silently overwritten.
+The storage model shall preserve:
+project_id
+revision_id
+model_version_id
+artifact_type
+artifact_version
+content_hash
+storage_reference
+created_at
+This permits recovery and provenance verification.
+
+15. CONTENT HASHING
+Recoverable artifacts shall be associated with cryptographic content hashes.
+Conceptually:
+ARTIFACT
+ ↓
+HASH
+ ↓
+STORAGE
+ ↓
+MANIFEST
+Upon recovery:
+RESTORED ARTIFACT
+ ↓
+RECALCULATE HASH
+ ↓
+COMPARE
+ ↓
+ACCEPT / REJECT
+A hash mismatch shall prevent an artifact from being treated as verified.
+
+16. PROJECT RECOVERY PACKAGE
+OneDraft shall eventually support creation of a project recovery package containing sufficient metadata to reconstruct a project.
+Conceptually:
+PROJECT METADATA
+MODEL STATE
+REVISION HISTORY
+CODE MANIFEST
+VALIDATION RESULTS
+DRAWING REFERENCES
+DOCUMENT REFERENCES
+ARTIFACT MANIFEST
+AUDIT REFERENCES
+The recovery package shall itself have a content hash.
+
+17. RECOVERY MANIFEST
+Every complete project recovery package shall contain a manifest identifying:
+project_id
+organization_id
+current_revision_id
+current_model_version_id
+code_manifest_id
+validation_run_id
+artifact_references
+artifact_hashes
+export_timestamp
+schema_version
+application_version
+This creates a deterministic recovery boundary.
+
+18. APPLICATION BACKUP
+Application services shall be treated as reproducible infrastructure rather than irreplaceable state.
+The recovery source shall include:
+SOURCE CODE
+CONTAINER DEFINITIONS
+PACKAGE DEFINITIONS
+DATABASE MIGRATIONS
+OPENAPI CONTRACT
+DOMAIN TYPES
+CONFIGURATION SCHEMAS
+DEPLOYMENT DEFINITIONS
+The application must be capable of being rebuilt from controlled source artifacts.
+
+19. INFRASTRUCTURE RECOVERY
+Infrastructure shall be represented through declarative configuration wherever practical.
+The recovery system shall preserve:
+CONTAINER CONFIGURATION
+NETWORK DEFINITIONS
+DATABASE CONFIGURATION
+QUEUE CONFIGURATION
+OBJECT STORAGE CONFIGURATION
+SERVICE DEFINITIONS
+RESOURCE POLICIES
+Infrastructure configuration shall not exist solely as undocumented manual changes.
+
+20. WORKER RECOVERY
+Workers are disposable execution resources.
+If a worker fails during a job:
+JOB REMAINS RECOVERABLE
+WORKER IS REPLACED
+JOB IS REQUEUED OR FAILED SAFELY
+PROJECT STATE REMAINS CONSISTENT
+Workers must not become the sole storage location for project state.
+
+21. QUEUE RECOVERY
+The job execution system shall protect queued work against worker failure.
+Jobs shall contain sufficient persistent metadata to reconstruct execution.
+At minimum:
+job_id
+project_id
+job_type
+request_payload
+model_version_id
+revision_id
+status
+attempt_count
+created_at
+
+22. JOB IDEMPOTENCY
+Recovery may result in a job being submitted more than once.
+Therefore job execution shall support idempotency.
+A recovered worker must determine whether:
+JOB HAS NOT EXECUTED
+JOB IS CURRENTLY EXECUTING
+JOB COMPLETED
+JOB FAILED
+JOB WAS SUPERSEDED
+before applying irreversible effects.
+
+23. STALE JOB PROTECTION
+A recovered job referencing an obsolete project state shall not modify the current model without revalidation.
+For example:
+JOB CREATED FOR REVISION 17
+ ↓
+PROJECT ADVANCES TO REVISION 18
+ ↓
+SYSTEM FAILURE
+ ↓
+JOB RECOVERED
+The job must recognize that Revision 17 is no longer current.
+It must either:
+REBASE
+REGENERATE
+CANCEL
+according to the operation type.
+
+24. CONFIGURATION RECOVERY
+Configuration required for production operation shall be recoverable.
+Configuration includes:
+SERVICE SETTINGS
+DATABASE CONNECTION SETTINGS
+QUEUE SETTINGS
+STORAGE SETTINGS
+MODEL CONFIGURATION
+FEATURE FLAGS
+JURISDICTION CONFIGURATION
+DRAWING TEMPLATES
+SYSTEM POLICIES
+Secrets themselves shall be handled through the dedicated secrets-management mechanism.
+
+25. SECRET RECOVERY
+Secrets shall not be stored inside ordinary database backups.
+The recovery architecture shall provide controlled recovery of:
+DATABASE CREDENTIALS
+API CREDENTIALS
+ENCRYPTION KEYS
+TOKEN SIGNING KEYS
+OBJECT STORAGE CREDENTIALS
+AI PROVIDER CREDENTIALS
+THIRD-PARTY INTEGRATION CREDENTIALS
+Secret recovery must require appropriate administrative authorization.
+
+26. IDENTITY RECOVERY
+Identity and authorization state must be recoverable independently of application services.
+The recovery process shall preserve:
+USERS
+ORGANIZATIONS
+MEMBERSHIPS
+ROLES
+AUTHORIZATION STATE
+ACCOUNT STATUS
+A restored project must not become accessible to an unauthorized organization because of incomplete identity recovery.
+
+27. SECURITY INCIDENT RECOVERY
+A security incident requires a different procedure from ordinary infrastructure failure.
+The incident workflow shall be:
+DETECT
+ ↓
+CONTAIN
+ ↓
+PRESERVE EVIDENCE
+ ↓
+REVOKE COMPROMISED CREDENTIALS
+ ↓
+ISOLATE AFFECTED SYSTEMS
+ ↓
+IDENTIFY LAST TRUSTED STATE
+ ↓
+RESTORE
+ ↓
+ROTATE SECRETS
+ ↓
+VALIDATE
+ ↓
+RESUME
+
+28. TRUSTED RECOVERY POINT
+The system must be able to identify the last known trusted recovery point.
+A recovery point shall identify:
+DATABASE TIMESTAMP
+APPLICATION VERSION
+SCHEMA VERSION
+CONFIGURATION VERSION
+ARTIFACT MANIFEST
+SECURITY STATE
+Recovery shall not blindly restore to the most recent backup if that backup may contain compromised state.
+
+29. RPO
+Recovery Point Objective defines the maximum acceptable amount of transactional data that may be lost.
+The initial OneDraft production target shall be:
+RPO TARGET: ≤ 15 MINUTES
+The architecture should support tighter RPO as infrastructure maturity increases.
+
+30. RTO
+Recovery Time Objective defines the target time to restore service.
+The initial target shall distinguish:
+CRITICAL PLATFORM SERVICES
+TARGET RTO: ≤ 4 HOURS
+
+NON-CRITICAL DERIVED SERVICES
+TARGET RTO: ≤ 12 HOURS
+Production capacity may justify tighter objectives in later versions.
+
+31. SERVICE PRIORITY
+Recovery priority shall be:
+1. DATABASE
+2. IDENTITY
+3. API
+4. PROJECT MODEL SERVICES
+5. QUEUE
+6. WORKERS
+7. OBJECT STORAGE ACCESS
+8. VALIDATION
+9. DOCUMENTATION GENERATION
+10. FRONTEND
+11. NON-CRITICAL INTEGRATIONS
+The priority order may be adjusted according to incident type.
+
+32. RECOVERY DEPENDENCY GRAPH
+The recovery sequence shall respect service dependencies.
+INFRASTRUCTURE
+ ↓
+DATABASE
+ ↓
+IDENTITY
+ ↓
+STORAGE
+ ↓
+API
+ ↓
+DOMAIN SERVICES
+ ↓
+QUEUE
+ ↓
+WORKERS
+ ↓
+VALIDATION
+ ↓
+DOCUMENTATION
+ ↓
+FRONTEND
+ ↓
+EXTERNAL INTEGRATIONS
+
+33. DATABASE RESTORE PROCEDURE
+The database restore procedure shall conceptually execute:
+STOP MUTATIONS
+ ↓
+IDENTIFY TARGET RECOVERY POINT
+ ↓
+RESTORE BASE BACKUP
+ ↓
+APPLY WAL
+ ↓
+VERIFY DATABASE INTEGRITY
+ ↓
+VERIFY SCHEMA VERSION
+ ↓
+VERIFY CRITICAL TABLES
+ ↓
+VERIFY PROJECT REFERENCES
+ ↓
+OPEN READ-ONLY VALIDATION
+ ↓
+PROMOTE
+
+34. DATABASE INTEGRITY VALIDATION
+After restoration the system shall verify:
+PRIMARY KEY INTEGRITY
+FOREIGN KEY INTEGRITY
+UNIQUE CONSTRAINTS
+REVISION CHAINS
+MODEL VERSION CHAINS
+PROJECT REFERENCES
+AUDIT EVENT SEQUENCES
+CODE MANIFEST REFERENCES
+DOCUMENT PACKAGE REFERENCES
+
+35. PROJECT STATE VALIDATION
+Each recovered project must be checked for consistency.
+At minimum:
+CURRENT REVISION EXISTS
+CURRENT MODEL VERSION EXISTS
+MODEL VERSION BELONGS TO PROJECT
+REVISION BELONGS TO PROJECT
+CODE MANIFEST IS ACCESSIBLE
+REFERENCED ARTIFACTS EXIST
+ARTIFACT HASHES MATCH
+
+36. REVISION CHAIN VALIDATION
+The revision graph shall be traversable from the current revision back to the project's initial revision.
+Conceptually:
+REVISION 1
+ ↓
+REVISION 2
+ ↓
+REVISION 3
+ ↓
+...
+ ↓
+CURRENT REVISION
+Broken parent relationships shall be treated as a recovery integrity failure.
+
+37. MODEL VERSION VALIDATION
+Model versions shall be verified against their stored state hashes.
+A mismatch indicates that the restored model state does not correspond to its recorded version.
+Such a state shall not be promoted without investigation.
+
+38. ARTIFACT MANIFEST VALIDATION
+The artifact manifest shall be compared against object storage.
+The recovery system shall detect:
+MISSING ARTIFACT
+DUPLICATE ARTIFACT
+HASH MISMATCH
+UNEXPECTED ARTIFACT
+BROKEN REFERENCE
+
+39. DOCUMENT PACKAGE VALIDATION
+A document package shall identify:
+PROJECT
+REVISION
+MODEL VERSION
+CODE MANIFEST
+VALIDATION RUN
+ARTIFACT HASH
+Recovery shall verify that all referenced components remain available.
+
+40. COMPLIANCE STATE RECOVERY
+Compliance data shall be recovered as versioned project state.
+The system must preserve:
+CODE SOURCES
+CODE RULES
+CODE MANIFESTS
+RETRIEVAL DATES
+SOURCE HASHES
+APPLICABILITY
+VALIDATION RESULTS
+A recovered project must not silently acquire a different regulatory basis.
+
+41. VALIDATION STATE RECOVERY
+Validation runs are historical records.
+They shall not be silently regenerated and substituted for the original result.
+The system shall preserve:
+validation_run_id
+project_id
+revision_id
+model_version_id
+code_manifest_id
+results
+timestamps
+status
+A regenerated validation may be recorded as a new validation run.
+
+42. AUDIT EVENT RECOVERY
+Audit events are append-only.
+Recovery shall preserve their ordering and timestamps.
+Recovered audit history must distinguish:
+ORIGINAL EVENT
+RECOVERY EVENT
+RESTORATION EVENT
+POST-RECOVERY EVENT
+Recovery itself becomes an auditable event.
+
+43. RECOVERY EVENT
+The system shall create a recovery event containing:
+recovery_id
+incident_id
+recovery_point
+database_backup_reference
+application_version
+schema_version
+operator_id
+start_time
+completion_time
+result
+
+44. BACKUP VERIFICATION
+A backup shall not be considered reliable merely because it completed successfully.
+The system shall verify:
+BACKUP EXISTS
+BACKUP IS READABLE
+BACKUP HASH MATCHES
+BACKUP METADATA IS VALID
+RESTORE CAN BEGIN
+Periodic complete restoration tests shall provide stronger assurance.
+
+45. RESTORE TESTING
+At defined intervals OneDraft shall execute restoration exercises.
+The test shall:
+SELECT BACKUP
+ ↓
+RESTORE TO ISOLATED ENVIRONMENT
+ ↓
+START SERVICES
+ ↓
+VERIFY DATABASE
+ ↓
+VERIFY PROJECTS
+ ↓
+VERIFY ARTIFACTS
+ ↓
+RUN INTEGRATION TESTS
+ ↓
+VERIFY DOCUMENT RECONSTRUCTION
+
+46. RECOVERY DRILL
+A full recovery drill shall test the ability to reconstruct the platform without relying on the original production instance.
+The drill shall measure:
+RECOVERY TIME
+DATA LOSS
+MISSING DEPENDENCIES
+FAILED SERVICES
+MANUAL STEPS
+OPERATOR ERRORS
+VALIDATION FAILURES
+
+47. RECOVERY SCORE
+Each recovery exercise shall produce a recovery assessment.
+Conceptually:
+RECOVERY SUCCESS
+DATA INTEGRITY
+SERVICE AVAILABILITY
+ARTIFACT INTEGRITY
+PROVENANCE INTEGRITY
+SECURITY INTEGRITY
+RPO PERFORMANCE
+RTO PERFORMANCE
+
+48. BUSINESS CONTINUITY MODES
+OneDraft shall support operational states:
+NORMAL
+DEGRADED
+READ_ONLY
+RECOVERY
+MAINTENANCE
+EMERGENCY
+
+49. READ-ONLY MODE
+When transactional integrity cannot be guaranteed, the platform may enter:
+READ_ONLY
+In this mode:
+PROJECT RETRIEVAL
+DOCUMENT RETRIEVAL
+HISTORICAL REVIEW
+AUDIT REVIEW
+may continue.
+Mutating operations shall be disabled.
+
+50. DEGRADED MODE
+A degraded system may continue operating while non-critical services are unavailable.
+For example:
+DOCUMENT GENERATION OFFLINE
+while:
+PROJECT ACCESS
+MODEL REVIEW
+REVISION HISTORY
+remain available.
+
+51. EMERGENCY MODE
+Emergency mode shall restrict the system to the minimum services required to protect project state and preserve operational continuity.
+Potentially:
+AUTHENTICATION
+PROJECT READ
+AUDIT
+RECOVERY ADMINISTRATION
+All other operations may be suspended.
+
+52. REGIONAL FAILURE
+The architecture shall eventually support recovery from loss of the primary infrastructure region.
+Recovery resources should be capable of being provisioned independently.
+The target architecture is:
+PRIMARY REGION
+       ↓
+REPLICATED BACKUP
+       ↓
+SECONDARY RECOVERY REGION
+
+53. STORAGE FAILURE
+If primary object storage becomes unavailable, the system shall be able to restore artifacts from a secondary backup or archival source.
+The project model must continue identifying the original artifact references and hashes.
+
+54. DATABASE FAILURE
+Database failure shall not cause loss of generated artifacts that are already stored independently.
+Likewise, artifact storage failure shall not destroy the transactional project history.
+This separation is fundamental to the recovery architecture.
+
+55. CORRUPTION RECOVERY
+Data corruption requires identification of the corruption boundary.
+The system shall determine:
+WHEN CORRUPTION BEGAN
+WHICH PROJECTS ARE AFFECTED
+WHICH REVISIONS ARE AFFECTED
+WHICH ARTIFACTS ARE AFFECTED
+WHICH BACKUP IS TRUSTED
+Recovery shall use the latest trusted state rather than merely the latest timestamp.
+
+56. PARTIAL PROJECT RECOVERY
+OneDraft shall eventually support restoration of an individual project without restoring the entire platform.
+The recovered project must preserve:
+PROJECT MODEL
+REVISION HISTORY
+COMPLIANCE STATE
+VALIDATION STATE
+DRAWINGS
+DOCUMENTS
+AUDIT HISTORY
+
+57. ORGANIZATION RECOVERY
+The system shall eventually support organization-level recovery.
+This includes:
+ORGANIZATION
+USERS
+MEMBERSHIPS
+PROJECTS
+BILLING REFERENCES
+ENTITLEMENTS
+AUDIT EVENTS
+Access controls must be reconstructed before project access is reopened.
+
+58. RECOVERY ISOLATION
+Recovered environments shall initially be isolated from production.
+Conceptually:
+BACKUP
+ ↓
+ISOLATED RECOVERY ENVIRONMENT
+ ↓
+VALIDATION
+ ↓
+SECURITY CHECK
+ ↓
+PROMOTION
+No recovered environment should automatically become authoritative.
+
+59. PROMOTION CRITERIA
+A recovered environment may be promoted only after:
+DATABASE VALIDATION PASSES
+ARTIFACT VALIDATION PASSES
+IDENTITY VALIDATION PASSES
+APPLICATION HEALTH PASSES
+SECURITY CHECK PASSES
+INTEGRATION TEST PASSES
+
+60. RECOVERY LOCK
+During major recovery operations, mutating project operations shall be controlled through a recovery lock.
+Conceptually:
+RECOVERY_LOCK = TRUE
+The API shall reject incompatible mutations until recovery validation is complete.
+
+61. RECOVERY CONSISTENCY
+The recovery process must preserve atomic relationships between:
+MODEL
+REVISION
+GEOMETRY
+VALIDATION
+DRAWING
+DOCUMENT
+ACCEPTANCE
+A recovered project must never expose a document generated from one revision while identifying another revision as its source.
+
+62. VERSION COMPATIBILITY
+Recovery must verify compatibility between:
+DATABASE SCHEMA VERSION
+APPLICATION VERSION
+MODEL VERSION
+ARTIFACT VERSION
+OPENAPI VERSION
+CONFIGURATION VERSION
+Migration or compatibility procedures must execute before restored data is exposed to newer services.
+
+63. DATABASE MIGRATION RECOVERY
+Database migrations must be immutable and versioned.
+The recovery process shall identify:
+LAST APPLIED MIGRATION
+TARGET MIGRATION
+MIGRATION COMPATIBILITY
+A migration must not be partially applied.
+
+64. APPLICATION ROLLBACK
+If a deployment causes operational failure, OneDraft shall support rollback to a previously known application version.
+Rollback shall not automatically roll back database state unless an explicitly supported database migration reversal exists.
+
+65. FORWARD-ONLY DATABASE MIGRATIONS
+The preferred database strategy shall use forward-compatible migrations.
+Conceptually:
+VERSION N
+ ↓
+VERSION N+1
+ ↓
+VERSION N+2
+Data preservation is preferred over destructive migration.
+
+66. BACKWARD COMPATIBILITY
+During deployment transitions, services may temporarily operate across adjacent application versions.
+The API and database contracts should therefore support controlled compatibility during deployment.
+
+67. RECOVERY CONFIGURATION VERSION
+Every recovery point shall identify the configuration version active at that time.
+This prevents the system from restoring data under incompatible configuration assumptions.
+
+68. TEMPLATE RECOVERY
+Documentation templates, title blocks and graphic standards shall be treated as versioned recoverable assets.
+A drawing generated using a specific template version must remain associated with that version.
+
+69. JURISDICTION CONFIGURATION RECOVERY
+Jurisdiction-specific configuration shall be recoverable independently.
+This includes:
+JURISDICTION IDENTIFIERS
+CODE SOURCES
+RULE CONFIGURATION
+UNIT SETTINGS
+DOCUMENT STANDARDS
+LOCAL REQUIREMENTS
+
+70. AI CONFIGURATION RECOVERY
+AI orchestration configuration shall preserve:
+MODEL PROVIDER
+MODEL IDENTIFIER
+PROMPT VERSION
+TOOL POLICY
+COMMAND POLICY
+CONTEXT POLICY
+EVALUATION CONFIGURATION
+The objective is reproducibility of AI-assisted operations where technically possible.
+
+71. AI OPERATION PROVENANCE
+AI-generated commands must remain associated with:
+COMMAND_ID
+PROJECT_ID
+REVISION_ID
+MODEL_VERSION_ID
+AI_CONFIGURATION_VERSION
+REQUEST
+RESULT
+VALIDATION
+Recovery must preserve this provenance.
+
+72. EXTERNAL INTEGRATION RECOVERY
+External integrations shall be independently classified as:
+CRITICAL
+IMPORTANT
+OPTIONAL
+Failure of an optional integration must not prevent core project recovery.
+
+73. EVENT BUS RECOVERY
+Event-driven operations shall be recoverable through persistent event records where required.
+Events that are necessary to reconstruct state must not exist solely in volatile message queues.
+
+74. EVENT REPLAY
+Where supported, the system may replay recoverable events.
+Replay must be:
+IDEMPOTENT
+VERSION-AWARE
+PROJECT-AWARE
+AUDITABLE
+Events must not be replayed against an incompatible model version.
+
+75. DUPLICATE EVENT PROTECTION
+Every recoverable event shall have a unique event identifier.
+Consumers shall prevent duplicate application of state-changing events.
+
+76. OBSERVABILITY RECOVERY
+The observability system shall preserve sufficient operational telemetry to diagnose recovery events.
+Important records include:
+ERROR LOGS
+SERVICE HEALTH
+JOB HISTORY
+DATABASE HEALTH
+RECOVERY EVENTS
+SECURITY EVENTS
+
+77. RECOVERY MONITORING
+During recovery, monitoring shall track:
+DATABASE RESTORE
+WAL REPLAY
+STORAGE RECOVERY
+SERVICE STARTUP
+QUEUE RECOVERY
+WORKER RECOVERY
+PROJECT VALIDATION
+ARTIFACT VALIDATION
+
+78. RECOVERY ALERTING
+Critical recovery failures shall generate operational alerts.
+Examples:
+BACKUP FAILURE
+WAL ARCHIVE FAILURE
+HASH MISMATCH
+DATABASE CORRUPTION
+RESTORE FAILURE
+MISSING ARTIFACT
+REVISION CHAIN FAILURE
+SECURITY VALIDATION FAILURE
+
+79. BACKUP FAILURE POLICY
+A failed backup must not silently replace the last known valid backup.
+The system shall retain the previous valid recovery point until a newer backup has been verified.
+
+80. BACKUP STATUS
+Backup records shall support states:
+STARTED
+COMPLETED
+VERIFIED
+FAILED
+EXPIRED
+RESTORED
+CORRUPTED
+
+81. BACKUP METADATA
+Each backup should record:
+backup_id
+backup_type
+source_system
+created_at
+completed_at
+size
+content_hash
+schema_version
+application_version
+storage_reference
+verification_status
+retention_class
+
+82. RECOVERY JOB MODEL
+Recovery operations shall execute through the OneDraft job architecture where practical.
+Recovery jobs shall contain:
+recovery_job_id
+recovery_id
+operation
+source_reference
+target_reference
+status
+progress
+started_at
+completed_at
+
+83. RECOVERY AUTHORIZATION
+Recovery operations require elevated authorization.
+The system shall distinguish:
+NORMAL ADMINISTRATION
+RECOVERY ADMINISTRATION
+SECURITY ADMINISTRATION
+No ordinary project-level permission shall permit platform-wide recovery.
+
+84. RECOVERY AUDIT
+Every recovery action shall generate an audit event.
+The audit record shall identify:
+WHO
+WHAT
+WHEN
+WHY
+FROM WHERE
+TO WHERE
+RESULT
+
+85. RECOVERY DOCUMENTATION
+The repository shall contain documented recovery procedures.
+Initial structure:
+/docs/recovery/
+    database.md
+    artifacts.md
+    application.md
+    infrastructure.md
+    security.md
+    full-platform.md
+
+86. RECOVERY AUTOMATION
+Manual recovery steps should be minimized.
+The long-term objective is:
+DETECT
+ ↓
+CLASSIFY
+ ↓
+PROVISION
+ ↓
+RESTORE
+ ↓
+VALIDATE
+ ↓
+PROMOTE
+with human authorization at critical promotion boundaries.
+
+87. AUTOMATED BACKUP VERIFICATION
+The system should automatically perform:
+BACKUP EXISTENCE CHECK
+HASH CHECK
+METADATA CHECK
+RESTORE TEST
+DATABASE HEALTH TEST
+according to configured schedules.
+
+88. AUTOMATED PROJECT RECONSTRUCTION TEST
+At least one representative project should periodically be reconstructed from stored recovery material.
+The system shall verify:
+PROJECT LOADS
+MODEL LOADS
+REVISION CHAIN LOADS
+GEOMETRY REFERENCES RESOLVE
+CODE MANIFEST RESOLVES
+VALIDATION RESULTS LOAD
+DRAWINGS RESOLVE
+DOCUMENT PACKAGE RESOLVES
+
+89. DOCUMENT REGENERATION TEST
+A recovered project should eventually be capable of regenerating its associated documentation.
+The test is:
+RECOVER PROJECT
+ ↓
+LOAD MODEL VERSION
+ ↓
+LOAD REVISION
+ ↓
+LOAD CODE MANIFEST
+ ↓
+RUN VALIDATION
+ ↓
+GENERATE DRAWINGS
+ ↓
+GENERATE DOCUMENT PACKAGE
+The resulting artifacts should be compared against the recorded provenance state.
+
+90. RECOVERY ACCEPTANCE CRITERIA
+A recovery is successful only when:
+DATABASE IS CONSISTENT
+PROJECTS ARE ACCESSIBLE
+REVISION HISTORY IS INTACT
+ARTIFACTS ARE AVAILABLE
+HASHES MATCH
+AUTHORIZATION IS CORRECT
+SERVICES ARE HEALTHY
+AUDIT EVENTS ARE PRESERVED
+CORE INTEGRATION TESTS PASS
+
+91. BUSINESS CONTINUITY TEST
+The platform shall periodically demonstrate that it can continue operating after loss of a non-critical service.
+For example:
+DOCUMENT GENERATION FAILURE
+must not prevent:
+PROJECT ACCESS
+MODEL REVIEW
+REDLINE CREATION
+REVISION MANAGEMENT
+
+92. DEPENDENCY FAILURE TEST
+The system shall test failure of:
+DATABASE
+QUEUE
+WORKER
+OBJECT STORAGE
+AI PROVIDER
+EXTERNAL INTEGRATION
+where safe and appropriate.
+The expected result must be defined for each failure.
+
+93. AI PROVIDER OUTAGE
+If the underlying AI provider becomes unavailable, the OneDraft project model shall remain operational.
+The system must preserve:
+PROJECT STATE
+REVISION STATE
+DOCUMENTATION
+VALIDATION
+AUDIT
+AI-dependent operations may enter:
+DEGRADED
+QUEUED
+UNAVAILABLE
+without corrupting project state.
+
+94. GEOMETRY ENGINE OUTAGE
+If the geometry engine becomes unavailable, existing validated project state must remain readable.
+New geometry operations may be queued until the engine becomes available.
+
+95. DOCUMENT ENGINE OUTAGE
+If document generation fails, previously generated document packages shall remain retrievable.
+A failed generation must not overwrite a previously valid package.
+
+96. COMPLIANCE ENGINE OUTAGE
+Existing code manifests and validation results shall remain available.
+A new compliance validation may be deferred until the compliance engine is restored.
+
+97. RECOVERY OF FINAL ACCEPTED PROJECT
+A finalized project must be recoverable as a complete historical state.
+The recovery target shall include:
+ACCEPTED REVISION
+MODEL VERSION
+CODE MANIFEST
+VALIDATION
+DRAWING SET
+DOCUMENT PACKAGE
+ACCEPTANCE RECORD
+
+98. IMMUTABLE FINAL ARTIFACTS
+Once a document package has been accepted and finalized, its underlying artifact references and hashes shall be preserved.
+Subsequent project changes create new revisions rather than mutating the accepted historical package.
+
+99. RECOVERY OF HISTORICAL PROJECT STATE
+The system must support restoration or reconstruction of historical project states.
+Given:
+PROJECT_ID
+REVISION_ID
+MODEL_VERSION_ID
+the system shall be capable of reconstructing the corresponding project state, subject to retained dependencies.
+
+100. RECOVERY PROVENANCE CHAIN
+The final recovery chain is:
+BACKUP
+ ↓
+DATABASE
+ ↓
+PROJECT
+ ↓
+MODEL VERSION
+ ↓
+REVISION
+ ↓
+CODE MANIFEST
+ ↓
+VALIDATION
+ ↓
+DRAWING
+ ↓
+DOCUMENT PACKAGE
+ ↓
+ACCEPTANCE
+ ↓
+AUDIT
+Every link must remain attributable.
+
+101. RECOVERY SECURITY BOUNDARY
+Recovery mechanisms must not become an alternate path around OneDraft authorization.
+Recovered systems shall still enforce:
+IDENTITY
+ORGANIZATION
+PROJECT
+ROLE
+SCOPE
+boundaries.
+
+102. RECOVERY ENVIRONMENT
+The production repository shall define distinct recovery environments:
+DEVELOPMENT
+TEST
+STAGING
+RECOVERY
+PRODUCTION
+Recovery testing shall not modify production data.
+
+103. RECOVERY DATA ISOLATION
+Restored data used for testing shall be isolated from production identities and credentials.
+Where appropriate, test environments shall use controlled synthetic or sanitized data.
+
+104. BUSINESS CONTINUITY CONTACTS
+Operational deployment shall eventually maintain defined responsibility for:
+SYSTEM ADMINISTRATION
+DATABASE ADMINISTRATION
+SECURITY
+APPLICATION OPERATIONS
+INFRASTRUCTURE
+RECOVERY AUTHORIZATION
+These responsibilities shall be represented operationally rather than embedded as assumptions inside the software.
+
+105. INCIDENT CLASSIFICATION
+Recovery incidents shall initially be classified as:
+INFRASTRUCTURE FAILURE
+DATABASE FAILURE
+STORAGE FAILURE
+APPLICATION FAILURE
+SECURITY INCIDENT
+DATA CORRUPTION
+REGIONAL OUTAGE
+EXTERNAL DEPENDENCY FAILURE
+
+106. INCIDENT SEVERITY
+Initial severity classes:
+SEV-1 — PLATFORM UNAVAILABLE OR DATA INTEGRITY THREAT
+SEV-2 — MAJOR SERVICE DEGRADATION
+SEV-3 — LIMITED SERVICE IMPACT
+SEV-4 — NON-CRITICAL OPERATIONAL ISSUE
+
+107. INCIDENT STATE
+Recovery incidents shall progress through:
+OPEN
+INVESTIGATING
+CONTAINED
+RECOVERING
+VALIDATING
+RESOLVED
+CLOSED
+
+108. POST-RECOVERY REVIEW
+Every significant recovery event shall produce a post-recovery review.
+The review shall identify:
+CAUSE
+IMPACT
+DATA LOSS
+RECOVERY TIME
+FAILED CONTROLS
+SUCCESSFUL CONTROLS
+CORRECTIVE ACTIONS
+
+109. RECOVERY IMPROVEMENT LOOP
+The recovery system shall continuously improve through:
+INCIDENT
+ ↓
+RECOVERY
+ ↓
+ANALYSIS
+ ↓
+CORRECTIVE ACTION
+ ↓
+ARCHITECTURE UPDATE
+ ↓
+RECOVERY TEST
+
+110. RECOVERY REGRESSION TESTING
+Changes to:
+DATABASE
+STORAGE
+MIGRATIONS
+JOB SYSTEM
+ARTIFACT SYSTEM
+IDENTITY
+SECURITY
+INFRASTRUCTURE
+shall trigger appropriate recovery regression testing.
+
+111. RECOVERY DEPENDENCY INVENTORY
+The platform shall maintain an inventory of dependencies required for complete recovery.
+At minimum:
+POSTGRESQL
+OBJECT STORAGE
+QUEUE
+WORKERS
+CONTAINER REGISTRY
+SECRETS
+IDENTITY
+DNS
+NETWORKING
+AI PROVIDER
+DOCUMENTATION ENGINE
+GEOMETRY ENGINE
+COMPLIANCE ENGINE
+
+112. RECOVERY READINESS CHECK
+Before a production release, the system should verify:
+BACKUPS CURRENT
+BACKUPS VERIFIED
+WAL ARCHIVING ACTIVE
+OBJECT STORAGE PROTECTED
+MIGRATIONS AVAILABLE
+CONTAINER IMAGES AVAILABLE
+CONFIGURATION AVAILABLE
+SECRETS RECOVERABLE
+RESTORE PROCEDURES CURRENT
+RECOVERY TEST STATUS ACCEPTABLE
+
+113. RELEASE RECOVERY GATE
+A production release shall not be considered complete unless the corresponding recovery capability remains available.
+A release must not create an unrecoverable state.
+
+114. BACKUP MONITORING DASHBOARD
+The administrative control plane shall eventually expose:
+LAST SUCCESSFUL BACKUP
+LAST VERIFIED BACKUP
+WAL ARCHIVE STATUS
+ARTIFACT BACKUP STATUS
+LAST RESTORE TEST
+RECOVERY READINESS
+CURRENT RPO
+CURRENT RTO
+
+115. RECOVERY METRICS
+Operational metrics shall include:
+backup_success_total
+backup_failure_total
+backup_duration
+backup_size
+restore_duration
+restore_success_total
+restore_failure_total
+artifact_integrity_failures
+recovery_incidents
+recovery_duration
+rpo_actual
+rto_actual
+
+116. RECOVERY ALERT THRESHOLDS
+Alerts should trigger when:
+BACKUP AGE EXCEEDS POLICY
+WAL ARCHIVING STOPS
+BACKUP VERIFICATION FAILS
+RESTORE TEST FAILS
+ARTIFACT HASH VERIFICATION FAILS
+RECOVERY TARGETS EXCEED RPO/RTO
+
+117. ARCHIVAL STORAGE
+Long-term project archives may be moved to lower-cost storage tiers while retaining their integrity and retrievability.
+Archived state must remain associated with:
+PROJECT
+REVISION
+MODEL VERSION
+ARTIFACT HASH
+RETENTION POLICY
+
+118. ARCHIVAL RESTORATION
+Archived projects shall be restorable into an isolated environment.
+Restoration shall verify artifact integrity before exposing the project to normal services.
+
+119. RETENTION POLICY INTEGRATION
+Retention rules shall integrate with the OneDraft Data Lifecycle & Provenance System.
+Backup retention must not independently delete information required by active project retention policies.
+
+120. LEGAL AND REGULATORY HOLD
+Where a project or artifact is subject to a preservation requirement, normal retention expiration must not delete the protected material.
+The recovery architecture shall respect preservation flags established by the data lifecycle subsystem.
+
+121. DELETION SAFETY
+Deletion of source project data shall not automatically destroy required disaster-recovery material until the applicable retention policy permits removal.
+Deletion operations shall be auditable.
+
+122. RECOVERY PACKAGE EXPORT
+The system shall eventually support a controlled export of a complete project recovery package.
+Conceptually:
+EXPORT PROJECT
+ ↓
+COLLECT MODEL
+ ↓
+COLLECT REVISIONS
+ ↓
+COLLECT COMPLIANCE
+ ↓
+COLLECT VALIDATION
+ ↓
+COLLECT DOCUMENTS
+ ↓
+COLLECT ARTIFACT MANIFEST
+ ↓
+HASH PACKAGE
+ ↓
+STORE
+
+123. RECOVERY PACKAGE IMPORT
+A recovery package may eventually be imported into a compatible OneDraft environment.
+Import shall execute:
+VERIFY SIGNATURE / HASH
+ ↓
+VERIFY VERSION COMPATIBILITY
+ ↓
+VERIFY REQUIRED ARTIFACTS
+ ↓
+VALIDATE PROJECT GRAPH
+ ↓
+IMPORT
+ ↓
+RUN RECOVERY TESTS
+
+124. CROSS-VERSION RECOVERY
+Recovery from an older OneDraft release into a newer release shall use controlled migration.
+The system shall not assume that arbitrary historical versions are directly compatible.
+
+125. SCHEMA EVOLUTION
+Database schema evolution shall preserve the ability to read historical project state wherever technically feasible.
+Destructive schema changes require explicit migration and archival planning.
+
+126. RECOVERY TEST DATASET
+The repository shall maintain a canonical recovery test project containing:
+ORGANIZATION
+BUILDING
+MULTIPLE LEVELS
+SPACES
+WALLS
+DOORS
+WINDOWS
+ASSEMBLIES
+CONSTRAINTS
+REVISION HISTORY
+REDLINES
+CODE MANIFEST
+VALIDATION RESULTS
+DRAWINGS
+DOCUMENT PACKAGE
+ACCEPTANCE
+This project becomes the standard recovery fixture.
+
+127. FULL PLATFORM RECOVERY TEST
+The full test shall execute:
+1. Destroy isolated application environment
+
+2. Restore infrastructure
+
+3. Restore PostgreSQL
+
+4. Restore object storage
+
+5. Restore configuration
+
+6. Restore secrets
+
+7. Restore identity
+
+8. Start API
+
+9. Start runtime orchestrator
+
+10. Restore queues
+
+11. Start workers
+
+12. Restore project
+
+13. Validate model
+
+14. Validate revisions
+
+15. Validate artifacts
+
+16. Validate compliance
+
+17. Validate documents
+
+18. Execute integration tests
+
+19. Confirm authorization
+
+20. Confirm audit continuity
+
+128. RECOVERY ACCEPTANCE TEST
+The recovery fixture shall pass:
+PROJECT LOAD
+MODEL LOAD
+REVISION LOAD
+GEOMETRY RESOLUTION
+CODE MANIFEST RESOLUTION
+VALIDATION RESOLUTION
+DRAWING RESOLUTION
+DOCUMENT RETRIEVAL
+DOCUMENT REGENERATION
+ACCEPTANCE RETRIEVAL
+AUDIT RETRIEVAL
+
+129. RECOVERY FAILURE CRITERIA
+Recovery fails if:
+PROJECT STATE IS INCONSISTENT
+REVISION CHAIN IS BROKEN
+MODEL HASH DOES NOT MATCH
+REQUIRED ARTIFACT IS MISSING
+ARTIFACT HASH DOES NOT MATCH
+AUTHORIZATION IS INCORRECT
+AUDIT HISTORY IS CORRUPTED
+DOCUMENT PROVENANCE IS BROKEN
+CORE SERVICES CANNOT START
+
+130. BUSINESS CONTINUITY SUCCESS CRITERIA
+The subsystem is successful when OneDraft can withstand:
+DATABASE FAILURE
+WORKER FAILURE
+QUEUE FAILURE
+STORAGE FAILURE
+APPLICATION FAILURE
+AI PROVIDER FAILURE
+REGIONAL INFRASTRUCTURE FAILURE
+SECURITY INCIDENT
+DATA CORRUPTION
+without losing the ability to reconstruct authoritative project state.
+
+131. IMPLEMENTATION REPOSITORY
+The recovery subsystem shall eventually contain:
+/recovery
+    /database
+    /artifacts
+    /infrastructure
+    /configuration
+    /security
+    /procedures
+    /tests
+
+132. INITIAL IMPLEMENTATION ARTIFACTS
+The first implementation package shall include:
+backup configuration
+database backup scripts
+WAL archive configuration
+artifact backup configuration
+restore scripts
+recovery validation scripts
+recovery test fixture
+recovery runbook
+
+133. RECOVERY RUNBOOK
+The production runbook shall provide deterministic procedures for:
+DATABASE FAILURE
+OBJECT STORAGE FAILURE
+APPLICATION FAILURE
+REGIONAL FAILURE
+SECURITY INCIDENT
+DATA CORRUPTION
+FULL PLATFORM RECOVERY
+
+134. AUTOMATION BOUNDARY
+Automation may execute:
+BACKUP
+VERIFICATION
+RESTORE PREPARATION
+HEALTH CHECKS
+INTEGRITY CHECKS
+RECOVERY TESTS
+Critical production promotion shall require explicit authorization.
+
+135. HUMAN CONTROL BOUNDARY
+The following actions require controlled authorization:
+PRODUCTION RESTORE
+RECOVERY PROMOTION
+SECURITY INCIDENT RESTORE
+DATA DELETION
+RETENTION OVERRIDE
+SECRET ROTATION
+PRODUCTION FAILOVER
+
+136. RECOVERY PROVENANCE
+Every recovery operation must remain distinguishable from ordinary project activity.
+The system shall never represent recovered data as though it were newly created data.
+
+137. RECOVERY AND AUDIT SEPARATION
+Recovery may restore historical audit records, but recovery operations themselves create new audit events.
+Therefore:
+HISTORICAL AUDIT
++
+RECOVERY AUDIT
+remain distinguishable.
+
+138. RECOVERY AND CUSTOMER ACCEPTANCE
+Customer acceptance records shall remain associated with the original accepted revision.
+Recovery shall not create a new acceptance event merely because the platform was restored.
+
+139. RECOVERY AND GENERATED DOCUMENTS
+Previously generated documents remain historical artifacts.
+A regenerated document is a new generation event and must not silently replace the original artifact.
+
+140. RECOVERY AND DRAWING PROVENANCE
+Recovered drawings shall preserve:
+DRAWING_ID
+REVISION_ID
+MODEL_VERSION_ID
+VIEW_ID
+TEMPLATE_VERSION
+ARTIFACT_HASH
+
+141. RECOVERY AND COMPLIANCE PROVENANCE
+Recovered compliance manifests shall preserve the original source versions and retrieval timestamps.
+A current code source must not be substituted for the historical source used by a prior validation without explicit creation of a new manifest.
+
+142. RECOVERY AND MODEL PROVENANCE
+The project model remains the authoritative computational source.
+Derived artifacts are recoverable consequences of the model.
+Therefore the recovery system prioritizes:
+MODEL
+ ↓
+REVISION
+ ↓
+VALIDATION
+ ↓
+DOCUMENTATION
+rather than treating PDFs as the sole project record.
+
+143. RECOVERY RECONSTRUCTION PRINCIPLE
+If an artifact is lost but the authoritative model and sufficient generation metadata remain available, the artifact should be regenerated.
+If the authoritative model is lost, artifact recovery alone is insufficient to reconstruct the full computational project state.
+
+144. DISASTER RECOVERY ARCHITECTURAL PRINCIPLE
+OneDraft shall be designed so that:
+STATE IS DURABLE
+WORK IS RESTARTABLE
+ARTIFACTS ARE VERIFIABLE
+SERVICES ARE REPRODUCIBLE
+EVENTS ARE AUDITABLE
+RECOVERY IS TESTABLE
+
+145. FINAL RECOVERY ARCHITECTURE
+The resulting architecture is:
+                ONEDRAFT
+                    │
+        ┌───────────┴───────────┐
+        │                       │
+   AUTHORITATIVE STATE     DERIVED ARTIFACTS
+        │                       │
+   PostgreSQL              Object Storage
+        │                       │
+        └───────────┬───────────┘
+                    │
+             BACKUP SYSTEM
+                    │
+          ┌─────────┴─────────┐
+          │                   │
+     PRIMARY BACKUP      ARCHIVAL BACKUP
+          │                   │
+          └─────────┬─────────┘
+                    │
+             RECOVERY SYSTEM
+                    │
+          ┌─────────┴─────────┐
+          │                   │
+    ISOLATED RESTORE      VALIDATION
+          │                   │
+          └─────────┬─────────┘
+                    │
+               PROMOTION
+                    │
+                ONEDRAFT
+
+146. END-TO-END RECOVERY CHAIN
+The complete recovery chain becomes:
+PROJECT
+ ↓
+MODEL
+ ↓
+REVISION
+ ↓
+COMPLIANCE MANIFEST
+ ↓
+VALIDATION
+ ↓
+DRAWING
+ ↓
+DOCUMENT
+ ↓
+ACCEPTANCE
+ ↓
+AUDIT
+ ↓
+BACKUP
+ ↓
+RESTORE
+ ↓
+RECONSTRUCTION
+
+147. 35.0 ENGINEERING STATE
+The OneDraft architecture now defines:
+Backup architecture
+Database recovery
+Point-in-time recovery
+Artifact recovery
+Recovery manifests
+Content verification
+Project reconstruction
+Application recovery
+Worker recovery
+Queue recovery
+Configuration recovery
+Secret recovery
+Identity recovery
+Security incident recovery
+RPO
+RTO
+Business continuity modes
+Recovery isolation
+Recovery validation
+Disaster recovery testing
+Operational recovery
+Historical state reconstruction
+Recovery provenance
+
+148. NEXT IMPLEMENTATION ARTIFACTS
+The executable implementation package for 35.0 shall eventually include:
+backup_manager.py
+database_backup.py
+artifact_backup.py
+restore_manager.py
+recovery_validator.py
+recovery_manifest.py
+recovery_jobs.py
+recovery_tests.py
+and associated infrastructure configuration.
+
+149. INTEGRATION WITH PRECEDING STACKS
+The Backup, Disaster Recovery & Business Continuity subsystem integrates directly with:
+Project Model
+Geometry Engine
+Compliance Engine
+Validation Engine
+Documentation Engine
+Review & Acceptance Engine
+Runtime Orchestrator
+Job & Worker Execution System
+Artifact & Storage Management Engine
+Integration & Event Bus
+Identity & Security System
+Observability System
+Testing System
+CI/CD System
+Infrastructure System
+Configuration System
+No preceding subsystem is redefined.
+
+150. FINAL ARCHITECTURAL DECISION
+OneDraft shall not treat backup as a periodic copy of a database.
+Backup and disaster recovery shall be implemented as a system-wide state preservation and reconstruction capability.
+The platform must preserve sufficient information to answer:
+WHAT WAS THE PROJECT?
+WHAT MODEL VERSION EXISTED?
+WHAT REVISION WAS CURRENT?
+WHAT CODE MANIFEST APPLIED?
+WHAT VALIDATION OCCURRED?
+WHAT DRAWINGS WERE GENERATED?
+WHAT DOCUMENTS WERE PRODUCED?
+WHAT WAS ACCEPTED?
+WHAT EVENTS OCCURRED?
+CAN THE STATE BE RECONSTRUCTED?
+The answer to each question must remain recoverable.
+
+151. SPECIFICATION STATUS
+ONEDRAFT BACKUP, DISASTER RECOVERY & BUSINESS CONTINUITY v0.1
+STATUS: ESTABLISHED
+The OneDraft architecture now contains the defined persistence, application, computational, compliance, validation, documentation, review, orchestration, execution, storage, event, security, observability, testing, deployment, configuration and recovery foundations.
