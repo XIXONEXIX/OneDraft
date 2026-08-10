@@ -1,7 +1,7 @@
 ONEDRAFT
 CAD-AI — Aria Powered
 Executable Application Stack & Runtime Architecture
-Version 0.1
+Version 1.0
 Status: Implementation Specification
 Predecessor: Database Schema & OpenAPI Contract v0.1
 Database: PostgreSQL
