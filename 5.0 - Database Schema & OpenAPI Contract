@@ -1,7 +1,7 @@
 ONEDRAFT
 CAD-AI — Aria Powered
 Database Schema & OpenAPI Contract
-Version 0.1
+Version 1.0
 Status: Implementation Specification
 Database: PostgreSQL
 API: REST / JSON
