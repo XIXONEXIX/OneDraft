@@ -1,201 +1,543 @@
-                                 Apache License
-                           Version 2.0, January 2004
-                        http://www.apache.org/licenses/
+                                 # ONEDRAFT™
 
-   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+## MASTER LICENSING AND INTELLECTUAL PROPERTY FRAMEWORK
 
-   1. Definitions.
+**Version 1.0**
 
-      "License" shall mean the terms and conditions for use, reproduction,
-      and distribution as defined by Sections 1 through 9 of this document.
+### PREAMBLE
 
-      "Licensor" shall mean the copyright owner or entity authorized by
-      the copyright owner that is granting the License.
+OneDraft™ is an AI-native architectural, engineering, and construction drafting platform comprising software, source code, APIs, domain schemas, documentation, artificial-intelligence systems, hosted services, project data structures, technical standards integrations, graphical assets, trademarks, and associated intellectual property.
 
-      "Legal Entity" shall mean the union of the acting entity and all
-      other entities that control, are controlled by, or are under common
-      control with that entity. For the purposes of this definition,
-      "control" means (i) the power, direct or indirect, to cause the
-      direction or management of such entity, whether by contract or
-      otherwise, or (ii) ownership of fifty percent (50%) or more of the
-      outstanding shares, or (iii) beneficial ownership of such entity.
+This Master Licensing and Intellectual Property Framework establishes the licensing structure governing the various components of the OneDraft™ platform.
 
-      "You" (or "Your") shall mean an individual or Legal Entity
-      exercising permissions granted by this License.
+The purpose of this framework is to preserve an open and extensible technical foundation while establishing appropriate protections and commercial rights for the official OneDraft™ platform, hosted services, proprietary technologies, trademarks, curated data, enterprise capabilities, and other separately designated materials.
 
-      "Source" form shall mean the preferred form for making modifications,
-      including but not limited to software source code, documentation
-      source, and configuration files.
+No provision of this framework shall be interpreted as converting proprietary materials into open-source materials unless such materials are expressly identified as being released under an applicable open-source license.
 
-      "Object" form shall mean any form resulting from mechanical
-      transformation or translation of a Source form, including but
-      not limited to compiled object code, generated documentation,
-      and conversions to other media types.
+---
 
-      "Work" shall mean the work of authorship, whether in Source or
-      Object form, made available under the License, as indicated by a
-      copyright notice that is included in or attached to the work
-      (an example is provided in the Appendix below).
+## PROVISION 1 — DEFINITIONS
 
-      "Derivative Works" shall mean any work, whether in Source or Object
-      form, that is based on (or derived from) the Work and for which the
-      editorial revisions, annotations, elaborations, or other modifications
-      represent, as a whole, an original work of authorship. For the purposes
-      of this License, Derivative Works shall not include works that remain
-      separable from, or merely link (or bind by name) to the interfaces of,
-      the Work and Derivative Works thereof.
+For purposes of this Framework:
 
-      "Contribution" shall mean any work of authorship, including
-      the original version of the Work and any modifications or additions
-      to that Work or Derivative Works thereof, that is intentionally
-      submitted to Licensor for inclusion in the Work by the copyright owner
-      or by an individual or Legal Entity authorized to submit on behalf of
-      the copyright owner. For the purposes of this definition, "submitted"
-      means any form of electronic, verbal, or written communication sent
-      to the Licensor or its representatives, including but not limited to
-      communication on electronic mailing lists, source code control systems,
-      and issue tracking systems that are managed by, or on behalf of, the
-      Licensor for the purpose of discussing and improving the Work, but
-      excluding communication that is conspicuously marked or otherwise
-      designated in writing by the copyright owner as "Not a Contribution."
+**“OneDraft™”** means the OneDraft software platform, ecosystem, services, documentation, intellectual property, trademarks, and associated technologies.
 
-      "Contributor" shall mean Licensor and any individual or Legal Entity
-      on behalf of whom a Contribution has been received by Licensor and
-      subsequently incorporated within the Work.
+**“OneDraft Core”** means the components expressly designated by the project as open-source software and distributed under the Apache License 2.0.
 
-   2. Grant of Copyright License. Subject to the terms and conditions of
-      this License, each Contributor hereby grants to You a perpetual,
-      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
-      copyright license to reproduce, prepare Derivative Works of,
-      publicly display, publicly perform, sublicense, and distribute the
-      Work and such Derivative Works in Source or Object form.
+**“OneDraft Platform”** means the broader technical system incorporating OneDraft Core together with additional services, applications, infrastructure, AI systems, proprietary modules, hosted services, and other components.
 
-   3. Grant of Patent License. Subject to the terms and conditions of
-      this License, each Contributor hereby grants to You a perpetual,
-      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
-      (except as stated in this section) patent license to make, have made,
-      use, offer to sell, sell, import, and otherwise transfer the Work,
-      where such license applies only to those patent claims licensable
-      by such Contributor that are necessarily infringed by their
-      Contribution(s) alone or by combination of their Contribution(s)
-      with the Work to which such Contribution(s) was submitted. If You
-      institute patent litigation against any entity (including a
-      cross-claim or counterclaim in a lawsuit) alleging that the Work
-      or a Contribution incorporated within the Work constitutes direct
-      or contributory patent infringement, then any patent licenses
-      granted to You under this License for that Work shall terminate
-      as of the date such litigation is filed.
+**“OneDraft Cloud”** means the hosted and managed OneDraft service operated by the official OneDraft provider.
 
-   4. Redistribution. You may reproduce and distribute copies of the
-      Work or Derivative Works thereof in any medium, with or without
-      modifications, and in Source or Object form, provided that You
-      meet the following conditions:
+**“OneDraft AI”** means artificial-intelligence orchestration, agent systems, inference infrastructure, model integrations, proprietary prompts, evaluation systems, specialized workflows, and associated technologies designated as proprietary or separately licensed.
 
-      (a) You must give any other recipients of the Work or
-          Derivative Works a copy of this License; and
+**“OneDraft Enterprise”** means commercial enterprise functionality, managed deployments, organizational controls, security features, support services, integrations, and other enterprise offerings.
 
-      (b) You must cause any modified files to carry prominent notices
-          stating that You changed the files; and
+**“OneDraft Standards”** means curated technical standards, rules, code data, mappings, interpretations, datasets, or other standards-related materials incorporated into or accessed through OneDraft.
 
-      (c) You must retain, in the Source form of any Derivative Works
-          that You distribute, all copyright, patent, trademark, and
-          attribution notices from the Source form of the Work,
-          excluding those notices that do not pertain to any part of
-          the Derivative Works; and
+**“OneDraft Data”** means user-created project information, project models, drawings, geometry, documentation, and other data submitted to or generated through a OneDraft installation or service.
 
-      (d) If the Work includes a "NOTICE" text file as part of its
-          distribution, then any Derivative Works that You distribute must
-          include a readable copy of the attribution notices contained
-          within such NOTICE file, excluding those notices that do not
-          pertain to any part of the Derivative Works, in at least one
-          of the following places: within a NOTICE text file distributed
-          as part of the Derivative Works; within the Source form or
-          documentation, if provided along with the Derivative Works; or,
-          within a display generated by the Derivative Works, if and
-          wherever such third-party notices normally appear. The contents
-          of the NOTICE file are for informational purposes only and
-          do not modify the License. You may add Your own attribution
-          notices within Derivative Works that You distribute, alongside
-          or as an addendum to the NOTICE text from the Work, provided
-          that such additional attribution notices cannot be construed
-          as modifying the License.
+**“OneDraft Marks”** means the OneDraft™ name, logos, product names, visual identity, service names, and associated trademarks or proposed trademarks.
 
-      You may add Your own copyright statement to Your modifications and
-      may provide additional or different license terms and conditions
-      for use, reproduction, or distribution of Your modifications, or
-      for any such Derivative Works as a whole, provided Your use,
-      reproduction, and distribution of the Work otherwise complies with
-      the conditions stated in this License.
+---
 
-   5. Submission of Contributions. Unless You explicitly state otherwise,
-      any Contribution intentionally submitted for inclusion in the Work
-      by You to the Licensor shall be under the terms and conditions of
-      this License, without any additional terms or conditions.
-      Notwithstanding the above, nothing herein shall supersede or modify
-      the terms of any separate license agreement you may have executed
-      with Licensor regarding such Contributions.
+# PROVISION 2 — OPEN-SOURCE CORE LICENSE
 
-   6. Trademarks. This License does not grant permission to use the trade
-      names, trademarks, service marks, or product names of the Licensor,
-      except as required for reasonable and customary use in describing the
-      origin of the Work and reproducing the content of the NOTICE file.
+The OneDraft Core source code designated by the repository as open source shall be distributed under the **Apache License, Version 2.0**.
 
-   7. Disclaimer of Warranty. Unless required by applicable law or
-      agreed to in writing, Licensor provides the Work (and each
-      Contributor provides its Contributions) on an "AS IS" BASIS,
-      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
-      implied, including, without limitation, any warranties or conditions
-      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
-      PARTICULAR PURPOSE. You are solely responsible for determining the
-      appropriateness of using or redistributing the Work and assume any
-      risks associated with Your exercise of permissions under this License.
+The Apache License 2.0 grants applicable recipients rights to use, reproduce, modify, distribute, sublicense, and commercially exploit the licensed source code subject to the terms and conditions of that license.
 
-   8. Limitation of Liability. In no event and under no legal theory,
-      whether in tort (including negligence), contract, or otherwise,
-      unless required by applicable law (such as deliberate and grossly
-      negligent acts) or agreed to in writing, shall any Contributor be
-      liable to You for damages, including any direct, indirect, special,
-      incidental, or consequential damages of any character arising as a
-      result of this License or out of the use or inability to use the
-      Work (including but not limited to damages for loss of goodwill,
-      work stoppage, computer failure or malfunction, or any and all
-      other commercial damages or losses), even if such Contributor
-      has been advised of the possibility of such damages.
+The complete Apache License 2.0 text shall be provided in the repository's `LICENSE` file.
 
-   9. Accepting Warranty or Additional Liability. While redistributing
-      the Work or Derivative Works thereof, You may choose to offer,
-      and charge a fee for, acceptance of support, warranty, indemnity,
-      or other liability obligations and/or rights consistent with this
-      License. However, in accepting such obligations, You may act only
-      on Your own behalf and on Your sole responsibility, not on behalf
-      of any other Contributor, and only if You agree to indemnify,
-      defend, and hold each Contributor harmless for any liability
-      incurred by, or claims asserted against, such Contributor by reason
-      of your accepting any such warranty or additional liability.
+Where required by the Apache License 2.0, copyright notices, license notices, attribution notices, and applicable NOTICE information shall be preserved.
 
-   END OF TERMS AND CONDITIONS
+The Apache License 2.0 applies only to materials expressly designated as being released under that license.
 
-   APPENDIX: How to apply the Apache License to your work.
+---
 
-      To apply the Apache License to your work, attach the following
-      boilerplate notice, with the fields enclosed by brackets "[]"
-      replaced with your own identifying information. (Don't include
-      the brackets!)  The text should be enclosed in the appropriate
-      comment syntax for the file format. We also recommend that a
-      file or class name and description of purpose be included on the
-      same "printed page" as the copyright notice for easier
-      identification within third-party archives.
+# PROVISION 3 — OPEN-SOURCE DOMAIN MODEL AND API
 
-   Copyright [yyyy] [name of copyright owner]
+The OneDraft canonical domain model and API components expressly designated as open-source components may be distributed under Apache License 2.0.
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+Such components may include, as expressly designated:
 
-       http://www.apache.org/licenses/LICENSE-2.0
+* canonical domain entities;
+* API schemas;
+* API specifications;
+* SDK interfaces;
+* foundational domain libraries;
+* interoperability interfaces;
+* developer tooling;
+* documentation necessary to use the open-source components;
+* and other components identified as part of OneDraft Core.
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+The open-source release does not automatically grant rights to proprietary hosted services, trademarks, proprietary datasets, proprietary AI systems, or separately licensed materials.
+
+---
+
+# PROVISION 4 — COMMERCIAL HOSTED SERVICES
+
+OneDraft Cloud is a commercial service independently offered by the official OneDraft provider.
+
+Access to OneDraft Cloud does not constitute a transfer of ownership of the underlying software, infrastructure, AI systems, proprietary technologies, trademarks, or service infrastructure.
+
+The official provider may offer OneDraft Cloud under free, subscription, usage-based, enterprise, educational, institutional, or other commercial service tiers.
+
+Service pricing, quotas, computational resources, storage, support, availability, and feature access may differ between service tiers.
+
+Access to a free OneDraft Cloud tier does not establish a permanent obligation to provide any particular level of service without charge.
+
+The terms governing hosted services shall be established separately through applicable Terms of Service.
+
+---
+
+# PROVISION 5 — COMMERCIAL LICENSE
+
+Components not expressly released under an open-source license may be made available through a separate commercial license.
+
+A commercial license may authorize specified users or organizations to:
+
+* deploy proprietary OneDraft components;
+* operate private instances;
+* access enterprise functionality;
+* integrate proprietary modules;
+* use commercial AI services;
+* receive technical support;
+* receive managed services;
+* obtain service-level commitments;
+* and access other capabilities designated by the provider.
+
+Commercial license terms may vary according to deployment type, organization size, usage, territory, support requirements, or other contractual conditions.
+
+---
+
+# PROVISION 6 — SELF-HOSTED DEPLOYMENT
+
+OneDraft may be made available for self-hosted deployment under one or more applicable licenses.
+
+Open-source components may be self-hosted pursuant to their applicable open-source licenses.
+
+Proprietary OneDraft components may require a separate commercial license.
+
+A self-hosted deployment may not use OneDraft Marks in a manner suggesting that the deployment is the official OneDraft service unless expressly authorized.
+
+---
+
+# PROVISION 7 — ONE-DRAFT AI
+
+OneDraft AI components may be divided into open and proprietary components.
+
+Open-source AI-related software released under Apache License 2.0 shall remain subject to that license.
+
+Proprietary AI orchestration, specialized agents, model-routing infrastructure, proprietary evaluation systems, proprietary prompts, private model configurations, inference infrastructure, and other designated technologies may be distributed under separate commercial terms.
+
+Access to an AI service does not necessarily grant ownership of the underlying model, model weights, training data, inference infrastructure, prompts, evaluation datasets, or associated intellectual property.
+
+Third-party AI models and services remain subject to their respective licenses and terms.
+
+---
+
+# PROVISION 8 — THIRD-PARTY MODELS AND DEPENDENCIES
+
+OneDraft may incorporate, interface with, or depend upon third-party software, libraries, models, datasets, fonts, standards, APIs, and other materials.
+
+Such materials are not automatically relicensed under the OneDraft license.
+
+Each third-party component remains subject to its applicable license or contractual terms.
+
+The OneDraft repository shall identify applicable third-party licenses where reasonably required.
+
+---
+
+# PROVISION 9 — PROJECT DATA
+
+Users retain ownership of project data they independently create and submit to OneDraft, subject to applicable third-party rights and contractual terms.
+
+Project data may include:
+
+* requirements;
+* project information;
+* building models;
+* geometry;
+* drawings;
+* sheets;
+* schedules;
+* annotations;
+* revisions;
+* redlines;
+* project documents;
+* and other user-created materials.
+
+The provision of OneDraft services does not, by itself, transfer ownership of user project data to the OneDraft provider.
+
+The provider may process project data to operate, secure, maintain, and provide the requested OneDraft services in accordance with applicable service terms.
+
+---
+
+# PROVISION 10 — GENERATED OUTPUT
+
+Subject to applicable law, third-party rights, model-provider terms, and the applicable service agreement, users may use project outputs generated through OneDraft for their permitted purposes.
+
+Generated output may include:
+
+* drawings;
+* documentation;
+* schedules;
+* model representations;
+* design proposals;
+* annotations;
+* reports;
+* and other project artifacts.
+
+OneDraft does not represent that every generated output is automatically free of third-party intellectual-property rights or regulatory restrictions.
+
+Users remain responsible for reviewing generated technical work before professional, contractual, regulatory, or construction use.
+
+---
+
+# PROVISION 11 — STANDARDS AND CODE INFORMATION
+
+OneDraft Standards may contain or reference information originating from governments, standards organizations, regulatory authorities, publishers, or other third parties.
+
+The inclusion of a CodeSource, CodeRule, or CodeCheck within the OneDraft architecture does not necessarily transfer ownership of the underlying standard or rule to OneDraft.
+
+Third-party standards remain subject to their applicable intellectual-property and licensing conditions.
+
+Where standards require a separate license, subscription, permission, or authorized access mechanism, OneDraft shall not be interpreted as granting such rights.
+
+---
+
+# PROVISION 12 — CODE-AWARE ANALYSIS
+
+OneDraft code-aware functionality is intended to assist users in organizing, evaluating, and reviewing project information against applicable rules and standards.
+
+A CodeCheck or other automated analysis does not, by itself, constitute legal advice, professional certification, regulatory approval, permit approval, or an official determination by an authority having jurisdiction.
+
+Users and qualified professionals remain responsible for determining the applicability and authoritative interpretation of governing requirements.
+
+---
+
+# PROVISION 13 — TRADEMARKS
+
+The names **OneDraft™**, **OneDraft**, associated product names, logos, service names, and other designated marks are separate from the copyright license governing OneDraft source code.
+
+The Apache License 2.0 does not grant a trademark license.
+
+Use of OneDraft Marks in modified, redistributed, hosted, commercial, or derivative products must not create confusion regarding official sponsorship, endorsement, certification, or origin.
+
+A third party may identify compatibility with OneDraft where such identification is truthful and non-misleading, subject to applicable trademark law and any published trademark policy.
+
+The official OneDraft service may reserve the exclusive right to use the OneDraft Marks in connection with official products and services.
+
+---
+
+# PROVISION 14 — CONTRIBUTOR LICENSE
+
+Contributions to OneDraft Core may be accepted under the applicable contribution terms established by the project.
+
+A contributor must have the necessary rights to submit the contribution.
+
+Unless otherwise agreed in writing, contributions intended for OneDraft Core shall be licensed under the same open-source license applicable to the relevant project component.
+
+The project may require a Contributor License Agreement or equivalent contribution terms for certain repositories or components.
+
+---
+
+# PROVISION 15 — COMMERCIAL EXTENSIONS
+
+Commercial extensions may be developed independently of OneDraft Core.
+
+Commercial extensions may include:
+
+* enterprise administration;
+* advanced collaboration;
+* proprietary AI capabilities;
+* managed cloud infrastructure;
+* specialized rendering;
+* advanced standards integrations;
+* private model integrations;
+* enterprise identity systems;
+* specialized analysis;
+* professional support systems;
+* and other proprietary capabilities.
+
+Commercial extensions are not automatically subject to the Apache License 2.0 merely because they interface with OneDraft Core.
+
+The licensing status of each extension shall be expressly identified.
+
+---
+
+# PROVISION 16 — OPEN-CORE COMPATIBILITY
+
+OneDraft is intended to support an open-core ecosystem.
+
+The existence of commercially licensed components does not restrict the rights granted by the Apache License 2.0 to independently licensed OneDraft Core components.
+
+Likewise, the open-source release of OneDraft Core does not require proprietary OneDraft services or independently developed commercial extensions to be released under Apache License 2.0, except where applicable copyright, derivative-work, dependency, or other legal requirements establish otherwise.
+
+---
+
+# PROVISION 17 — API ACCESS
+
+Public APIs designated as open-source or publicly documented may be used according to their published terms.
+
+Commercial APIs, hosted inference APIs, enterprise APIs, metered services, or restricted interfaces may be subject to separate usage terms.
+
+API credentials are not transferable unless expressly authorized.
+
+Automated access may be subject to rate limits, usage limits, security controls, and service-specific restrictions.
+
+---
+
+# PROVISION 18 — ENTERPRISE LICENSING
+
+Enterprise customers may obtain additional rights through written commercial agreements.
+
+Enterprise agreements may address:
+
+* private deployment;
+* data residency;
+* security requirements;
+* service-level commitments;
+* support;
+* integration;
+* identity management;
+* dedicated infrastructure;
+* confidential processing;
+* audit requirements;
+* and other organizational requirements.
+
+Where a written enterprise agreement conflicts with a general service term, the negotiated agreement shall govern to the extent expressly stated.
+
+---
+
+# PROVISION 19 — EDUCATIONAL AND RESEARCH USE
+
+OneDraft may be offered under special educational or research programs.
+
+Such programs may provide free or reduced-cost access to commercial services while retaining the applicable ownership and licensing structure.
+
+Open-source components remain available under their applicable open-source licenses.
+
+---
+
+# PROVISION 20 — DATA AND PRIVACY
+
+OneDraft services may process information necessary to provide requested functionality.
+
+The provider shall establish separate privacy terms governing the collection, processing, retention, security, and deletion of personal information.
+
+Users should not submit information to OneDraft services unless they have the authority to provide and process such information.
+
+Additional enterprise data-processing agreements may apply where required.
+
+---
+
+# PROVISION 21 — SECURITY
+
+OneDraft implementations shall employ reasonable technical and organizational measures appropriate to the deployment and sensitivity of the applicable environment.
+
+Security-sensitive components may be distributed separately from general open-source components.
+
+Disclosure of security vulnerabilities should follow the project's published security reporting process.
+
+---
+
+# PROVISION 22 — NO AUTOMATIC PROFESSIONAL AUTHORITY
+
+OneDraft is software and does not itself become an architect, engineer, contractor, regulator, authority having jurisdiction, standards organization, or other professional authority merely by generating or analyzing project information.
+
+Professional responsibility for design, engineering, code interpretation, construction documentation, certification, permitting, and construction remains subject to the applicable professional and regulatory framework.
+
+---
+
+# PROVISION 23 — NO WARRANTY THROUGH OPEN-SOURCE LICENSE
+
+Open-source OneDraft components distributed under Apache License 2.0 are provided according to the warranty and liability provisions of that license.
+
+Commercial services may be subject to separate warranty, service-level, support, limitation-of-liability, and indemnification provisions established through applicable commercial agreements.
+
+---
+
+# PROVISION 24 — LICENSE VERSIONING
+
+The licensing designation of each OneDraft repository or component shall be expressly identified.
+
+A future version of OneDraft may introduce additional licenses, dual licensing, commercial licensing, or revised licensing arrangements for newly created components.
+
+A change in the licensing of future releases shall not retroactively revoke rights already granted under an applicable open-source license.
+
+---
+
+# PROVISION 25 — SEPARABILITY OF COMPONENT LICENSES
+
+The OneDraft ecosystem may contain components governed by different licenses.
+
+For clarity:
+
+**OneDraft Core**
+Apache License 2.0.
+
+**OneDraft Cloud**
+Commercial service terms.
+
+**OneDraft Enterprise**
+Commercial license and/or enterprise agreement.
+
+**OneDraft AI proprietary components**
+Commercial or proprietary license as designated.
+
+**Third-party dependencies**
+Their respective licenses.
+
+**Standards and regulatory data**
+Applicable third-party rights and licenses.
+
+**OneDraft Marks**
+Separate trademark rights.
+
+**User Project Data**
+Owned or controlled by the applicable user or rights holder, subject to applicable agreements and law.
+
+---
+
+# PROVISION 26 — COMMERCIAL BUSINESS MODEL
+
+OneDraft may generate revenue through multiple independent channels without restricting the rights granted to the open-source OneDraft Core.
+
+Commercial offerings may include:
+
+**OneDraft Cloud** — hosted subscription services.
+
+**OneDraft Pro** — professional design and documentation capabilities.
+
+**OneDraft Team** — collaborative project environments.
+
+**OneDraft Enterprise** — enterprise deployment, administration, security, and support.
+
+**OneDraft Private** — private or self-hosted commercial deployments.
+
+**OneDraft AI** — metered or subscription-based AI computation and specialized intelligence.
+
+**OneDraft API** — usage-based API access.
+
+**OneDraft Services** — implementation, integration, training, support, and professional services.
+
+The commercial model may evolve independently of the open-source core.
+
+---
+
+# PROVISION 27 — OFFICIAL DISTRIBUTION
+
+The official OneDraft distribution shall be identified through designated project repositories, official domains, release signatures, package identifiers, or other verification mechanisms.
+
+Third-party distributions may exist and may be legally permitted under applicable open-source licenses.
+
+Third-party distributions shall not automatically constitute official OneDraft releases.
+
+---
+
+# PROVISION 28 — GOVERNANCE
+
+The OneDraft project may establish separate governance for:
+
+* open-source development;
+* commercial product development;
+* security;
+* standards integration;
+* trademark administration;
+* community contributions;
+* and enterprise services.
+
+Governance structures may evolve as the project develops.
+
+---
+
+# PROVISION 29 — COPYRIGHT AND NOTICE
+
+Copyright notices contained within OneDraft source files, documentation, or other protected materials shall be preserved as required by the applicable license.
+
+Nothing in this Framework transfers ownership of intellectual property except where expressly stated in a written agreement.
+
+---
+
+# PROVISION 30 — INTERPRETATION
+
+This Framework is intended to establish the licensing architecture of OneDraft™.
+
+Where a specific component contains its own `LICENSE`, `NOTICE`, terms of service, commercial agreement, or other governing instrument, that instrument shall control the licensing of that component to the extent applicable.
+
+The open-source license applicable to OneDraft Core shall remain distinct from commercial service terms, trademark rights, third-party intellectual-property rights, and user-owned project data.
+
+---
+
+# PROVISION 31 — LICENSE HIERARCHY
+
+The intended OneDraft licensing hierarchy is:
+
+```text
+                         ONEDRAFT™
+                             │
+          ┌──────────────────┼──────────────────┐
+          │                  │                  │
+     OPEN SOURCE         COMMERCIAL          THIRD PARTY
+          │                  │                  │
+    Apache 2.0          Service Terms      Their License
+          │                  │                  │
+    OneDraft Core       Cloud / Enterprise    Libraries
+    Domain / API        AI / API / Support    Models
+    SDK / Tooling       Private Deployment    Standards
+          │                  │                  │
+          └──────────────────┼──────────────────┘
+                             │
+                       USER PROJECT DATA
+                             │
+                      User-Controlled Data
+```
+
+This hierarchy is intended to permit broad adoption of the open technical foundation while preserving sustainable commercial opportunities around hosted services, proprietary technologies, enterprise capabilities, and the OneDraft brand.
+
+---
+
+# PROVISION 32 — EFFECTIVE LICENSING STRUCTURE
+
+Unless expressly designated otherwise:
+
+**OneDraft Core:** Apache License 2.0.
+
+**OneDraft Cloud:** Commercial service.
+
+**OneDraft Pro:** Commercial service/license.
+
+**OneDraft Team:** Commercial service/license.
+
+**OneDraft Enterprise:** Commercial license/agreement.
+
+**OneDraft Private:** Commercial deployment license where proprietary components are included.
+
+**OneDraft AI proprietary infrastructure:** Commercial/proprietary license.
+
+**Public APIs:** License or API terms designated for the applicable API.
+
+**Third-party software:** Applicable third-party license.
+
+**Standards and code databases:** Applicable third-party licensing terms.
+
+**User Project Data:** User-controlled, subject to applicable agreements and law.
+
+**OneDraft™ trademarks and branding:** Reserved separately from the software copyright license.
+
+---
+
+# PROVISION 33 — FINAL STATEMENT
+
+OneDraft™ is intended to establish an open technical foundation for intelligent CAD/BIM while maintaining a sustainable commercial ecosystem capable of supporting continued engineering, infrastructure, artificial-intelligence development, standards integration, security, hosting, research, and enterprise deployment.
+
+The licensing architecture therefore distinguishes between **open software**, **commercial services**, **proprietary technology**, **third-party materials**, **user data**, and **trademark rights**.
+
+The objective is not to restrict the development of the OneDraft ecosystem.
+
+The objective is to allow the ecosystem to grow while preserving a viable official OneDraft platform capable of funding the continued development of the technology.
+
+**OneDraft™**
+
+**Open Core. Intelligent Platform. Commercial Ecosystem.**
