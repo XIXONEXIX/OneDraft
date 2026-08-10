@@ -1,0 +1,246 @@
+ONEDRAFT
+CAD-AI — Aria Powered
+Complete Architectural & Implementation Stack Register — 1.0–50.0
+Stack
+Proposed document
+Purpose
+1.0
+Foundational Technical Specification
+Product definition, foundational principles, objectives, scope, architectural assumptions and core OneDraft requirements
+2.0
+System Architecture Specification
+Overall OneDraft system architecture, subsystem boundaries, service relationships and architectural principles
+3.0
+MVP Technical Stack & Repository Architecture
+Technology selection, repository structure, applications, packages, development environment and MVP implementation boundaries
+4.0
+API & Domain Schema Specification
+Domain entities, service contracts, API resources, object relationships and foundational application schemas
+5.0
+Database Schema & OpenAPI Contract
+PostgreSQL persistence model, database schemas, OpenAPI contract, versioning, transactions and API conventions
+6.0
+Executable Foundation Implementation Specification
+Conversion of the architectural specification into executable foundation artifacts, domain models, migrations and service boundaries
+7.0
+Executable Application Stack & Runtime Architecture
+Application execution model, runtime services, processes, service startup and application-layer architecture
+8.0
+Executable Software Stack & Foundation Implementation
+Core software implementation structure, packages, dependencies, application foundation and executable components
+9.0
+Executable Application Stack & Implementation Architecture
+Application implementation architecture, domain services, application services and execution boundaries
+10.0
+Executable Application Stack & Implementation Architecture
+Consolidated executable application architecture and implementation progression toward the operational OneDraft platform
+11.0
+Executable Application & Domain Service Layer
+Domain services, application services, command boundaries and executable business logic
+12.0
+Executable Repository Foundation & Core Application Runtime
+Repository implementation, core runtime, application initialization, configuration and foundational execution
+13.0
+Application Runtime, Service Architecture & Execution Stack
+Runtime service topology, service execution, internal interfaces and application process architecture
+14.0
+Computational Project Model & Geometry Engine
+Computational representation of projects, architectural objects, relationships, geometry and parametric model behavior
+15.0
+Executable Application Stack & Service Architecture
+Executable service composition, application boundaries, internal service interfaces and operational implementation
+16.0
+Runtime & Application Orchestration Stack
+Runtime orchestration, workflow coordination, service sequencing and execution control
+17.0
+Geometry & Parametric Model Engine
+Parametric architectural geometry, spatial relationships, constraints, geometry computation and model regeneration
+18.0
+Compliance & Regulatory Engine
+Jurisdictional code sources, regulatory rules, applicability analysis, code manifests and compliance computation
+19.0
+Validation & Verification Engine
+Deterministic project validation, rule execution, verification results, severity classification and validation workflows
+20.0
+Validation & Coordination Engine
+Cross-system coordination, model coordination, drawing coordination, constraint checking and multidisciplinary verification
+21.0
+Documentation & Drawing Generation Engine
+Plans, elevations, sections, details, schedules, sheets, annotations, dimensions and architectural document generation
+22.0
+Project Review, Redline, Acceptance & Approval Engine
+Customer review, redlines, revision requests, acceptance workflows, professional review and approval tracking
+23.0
+Runtime Orchestrator
+Central orchestration of OneDraft workflows, subsystem execution, command routing and lifecycle coordination
+24.0
+Job & Worker Execution System
+Asynchronous jobs, queues, workers, long-running operations, job state, retries and execution management
+25.0
+Artifact & Storage Management Engine
+Generated files, document packages, geometry artifacts, object storage, hashes, references and artifact lifecycle
+26.0
+Integration & Event Bus
+Internal events, asynchronous messaging, event contracts, service integration, event routing and system decoupling
+27.0
+Identity, Access & Security System
+Identity foundations, authentication, organizational membership, access boundaries and security primitives
+28.0
+Identity, Security & Authorization System
+Authorization policies, scopes, roles, permissions, resource access and security enforcement
+29.0
+Identity, Access Control & Security System
+Consolidated access-control architecture, project authorization, tenant boundaries, privileged operations and security enforcement
+30.0
+Observability, Telemetry & System Health
+Metrics, logs, traces, health checks, diagnostics, alerts and system-state visibility
+31.0
+Testing, Quality Assurance & Verification System
+Unit, integration, contract, geometry, regression, E2E and acceptance testing
+32.0
+CI/CD, Build & Release Engineering
+Automated builds, migrations, testing gates, deployments, versioning and releases
+33.0
+Infrastructure & Deployment Architecture
+Containers, environments, networking, PostgreSQL, queues, workers, object storage and production topology
+34.0
+Configuration, Secrets & Environment Management
+Environment separation, secrets, configuration hierarchy and runtime configuration
+35.0
+Backup, Disaster Recovery & Business Continuity
+Database recovery, artifact recovery, RPO/RTO, restore procedures and operational continuity
+36.0
+Data Lifecycle, Retention & Provenance System
+Data ownership, retention, archival, lineage, hashes, immutable records and deletion rules
+37.0
+AI Intelligence & Model Provider Architecture
+Aria orchestration, model adapters, prompts, context construction, model selection, evaluation and provider abstraction
+38.0
+AI Evaluation, Guardrails & Deterministic Command Verification
+AI output evaluation, command safety, confidence, constraint preservation and deterministic validation
+39.0
+Standards, Architectural Graphics & CAD Interoperability
+CAD standards, IFC, DXF/DWG interoperability, BIM exchange, layers, lineweights, symbols and graphic standards
+40.0
+Import, Export & External Data Exchange
+Survey data, existing CAD/BIM, PDFs, images, specifications and external project data
+41.0
+Frontend & User Interaction Architecture
+Project workspace, model viewer, drawing interface, redlines, review, acceptance and Aria interaction
+42.0
+Project Lifecycle & State Machine
+Formal project states from intake through specification, modeling, validation, documentation, review and acceptance
+43.0
+Billing, Subscription & Entitlement Architecture
+Plans, usage, quotas, feature entitlements, metering and organization billing boundaries
+44.0
+Multi-Tenant Organization & Project Isolation
+Tenant boundaries, resource isolation, quotas, organization hierarchy and data segregation
+45.0
+API Gateway, Rate Limiting & Service Protection
+Request controls, throttling, abuse protection, API quotas and service boundaries
+46.0
+Performance, Scalability & Capacity Architecture
+Geometry workloads, concurrent projects, queue scaling, database scaling and performance targets
+47.0
+Disaster Testing, Security Testing & Operational Readiness
+Failure injection, recovery tests, penetration/security testing and production-readiness gates
+48.0
+Developer Platform, SDK & Extension Architecture
+Python/TypeScript clients, SDKs, plugins, external integrations and future third-party extensions
+49.0
+Product Configuration & Administrative Control Plane
+Platform administration, feature flags, jurisdiction configuration, templates and controlled system settings
+50.0
+OneDraft End-to-End System Integration Specification
+Master integration document proving how all preceding subsystems operate together as one coherent OneDraft platform
+STACK PROGRESSION
+1.0–5.0
+FOUNDATION
+        ↓
+6.0–16.0
+EXECUTABLE APPLICATION FOUNDATION
+        ↓
+17.0–22.0
+CORE COMPUTATIONAL & DOCUMENTATION ENGINES
+        ↓
+23.0–29.0
+RUNTIME, JOBS, ARTIFACTS, EVENTS & SECURITY
+        ↓
+30.0–36.0
+OPERATIONS, QUALITY, INFRASTRUCTURE & DATA GOVERNANCE
+        ↓
+37.0–40.0
+AI, CAD STANDARDS & DATA EXCHANGE
+        ↓
+41.0–49.0
+USER PLATFORM, LIFECYCLE, COMMERCIAL & SCALE SYSTEMS
+        ↓
+50.0
+END-TO-END SYSTEM INTEGRATION
+ARCHITECTURAL COMPLETION STATE
+FOUNDATION
+        +
+DOMAIN
+        +
+COMPUTATIONAL PROJECT MODEL
+        +
+GEOMETRY
+        +
+COMPLIANCE
+        +
+VALIDATION
+        +
+DOCUMENTATION
+        +
+REVIEW / ACCEPTANCE
+        +
+RUNTIME ORCHESTRATION
+        +
+JOB EXECUTION
+        +
+ARTIFACT STORAGE
+        +
+EVENT BUS
+        +
+IDENTITY / SECURITY
+        +
+OBSERVABILITY
+        +
+TESTING
+        +
+CI/CD
+        +
+INFRASTRUCTURE
+        +
+DATA GOVERNANCE
+        +
+ARIA INTELLIGENCE
+        +
+CAD INTEROPERABILITY
+        +
+EXTERNAL DATA EXCHANGE
+        +
+FRONTEND
+        +
+PROJECT LIFECYCLE
+        +
+BILLING
+        +
+MULTI-TENANCY
+        +
+API PROTECTION
+        +
+SCALABILITY
+        +
+OPERATIONAL READINESS
+        +
+SDK / EXTENSIONS
+        +
+ADMINISTRATION
+        ↓
+ONEDRAFT END-TO-END SYSTEM
+MASTER STACK REGISTER
+1.0–50.0 — ONEDRAFT CAD-AI / ARIA POWERED
+The 50-stack architecture establishes the complete progression from foundational technical definition through executable software, computational modeling, regulatory analysis, documentation generation, runtime execution, security, operations, artificial intelligence, user interaction, commercialization, scalability and final end-to-end system integration.
+The architecture therefore proceeds from specification → implementation → computation → orchestration → operation → integration, with each stack inheriting the contracts and system boundaries established by the preceding stacks.
