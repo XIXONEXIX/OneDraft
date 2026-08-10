@@ -1,0 +1,377 @@
+OneDraft™
+│
+├── 0. FOUNDATION
+│   │
+│   ├── Identity
+│   │   ├── OneDraft™
+│   │   ├── Product Identity
+│   │   ├── Version
+│   │   └── Project License
+│   │
+│   ├── Principles
+│   │   ├── Design Intent
+│   │   ├── Canonical Truth
+│   │   ├── Structured Information
+│   │   ├── Parametric Relationships
+│   │   ├── Traceability
+│   │   ├── Revision Integrity
+│   │   └── Reproducible Documentation
+│   │
+│   └── System Kernel
+│       ├── IDs
+│       ├── Types
+│       ├── Units
+│       ├── Coordinates
+│       ├── Transactions
+│       ├── Events
+│       └── Validation
+│
+├── 1. ORGANIZATIONAL ROOT
+│   │
+│   ├── Organization
+│   ├── User
+│   ├── Roles
+│   ├── Permissions
+│   ├── Projects
+│   └── Project Membership
+│
+├── 2. PROJECT ROOT
+│   │
+│   └── Project
+│       │
+│       ├── Requirements
+│       ├── Site
+│       │   ├── Location
+│       │   ├── Boundary
+│       │   ├── Survey
+│       │   └── Site Constraints
+│       │
+│       └── Building
+│           │
+│           ├── Building Identity
+│           ├── Occupancy
+│           ├── Classification
+│           └── Building Systems
+│
+├── 3. SPATIAL TREE
+│   │
+│   └── Building
+│       │
+│       ├── Levels
+│       │   ├── Foundation
+│       │   ├── P2
+│       │   ├── P1
+│       │   ├── Ground
+│       │   ├── L1
+│       │   ├── L2
+│       │   ├── L3
+│       │   └── Roof / Truss
+│       │
+│       ├── Grids
+│       │   ├── Horizontal Axes
+│       │   ├── Vertical Axes
+│       │   └── Grid Relationships
+│       │
+│       └── Spaces
+│           ├── Rooms
+│           ├── Corridors
+│           ├── Shafts
+│           ├── Cores
+│           ├── Zones
+│           └── Space Boundaries
+│
+├── 4. BUILDING ELEMENT TREE
+│   │
+│   ├── Elements
+│   │   ├── Walls
+│   │   ├── Doors
+│   │   ├── Windows
+│   │   ├── Columns
+│   │   ├── Beams
+│   │   ├── Slabs
+│   │   ├── Roofs
+│   │   ├── Stairs
+│   │   ├── Ramps
+│   │   ├── Ceilings
+│   │   ├── Equipment
+│   │   ├── Fixtures
+│   │   └── Generic Elements
+│   │
+│   └── Assemblies
+│       ├── Wall Assemblies
+│       ├── Floor Assemblies
+│       ├── Roof Assemblies
+│       ├── Structural Assemblies
+│       └── Building-System Assemblies
+│
+├── 5. INFORMATION TREE
+│   │
+│   ├── Parameters
+│   ├── Properties
+│   ├── Materials
+│   ├── Specifications
+│   ├── Classifications
+│   ├── Metadata
+│   └── External References
+│
+├── 6. RELATIONSHIP TREE
+│   │
+│   ├── Contains
+│   ├── Hosted By
+│   ├── Adjacent To
+│   ├── Connects To
+│   ├── Supports
+│   ├── Depends On
+│   ├── References
+│   ├── Aligned With
+│   └── Intersects
+│
+├── 7. GEOMETRY TREE
+│   │
+│   ├── Points
+│   ├── Lines
+│   ├── Curves
+│   ├── Polylines
+│   ├── Surfaces
+│   ├── Solids
+│   ├── Bounding Volumes
+│   ├── Coordinate Systems
+│   ├── Transformations
+│   ├── Geometry References
+│   └── Spatial Relationships
+│
+├── 8. CONSTRAINT TREE
+│   │
+│   ├── Dimensional Constraints
+│   ├── Geometric Constraints
+│   ├── Spatial Constraints
+│   ├── Design Constraints
+│   ├── Performance Constraints
+│   ├── Project Requirements
+│   └── Code Constraints
+│
+├── 9. KNOWLEDGE / CODE TREE
+│   │
+│   ├── Code Sources
+│   │   ├── Jurisdiction
+│   │   ├── Edition
+│   │   └── Source
+│   │
+│   ├── Code Rules
+│   ├── Code Parameters
+│   ├── Code Checks
+│   ├── Compliance Results
+│   └── Evidence / References
+│
+├── 10. ARIA INTELLIGENCE TREE
+│   │
+│   ├── Natural Language
+│   │
+│   ├── Aria Command
+│   │   ├── Intent
+│   │   ├── Entities
+│   │   ├── Parameters
+│   │   ├── Operations
+│   │   └── Context
+│   │
+│   ├── Design Intent
+│   ├── Design Proposal
+│   ├── Proposal Evaluation
+│   ├── Model Modification
+│   ├── Validation
+│   └── Explanation
+│
+├── 11. MODEL TREE
+│   │
+│   ├── Canonical Project Model
+│   │
+│   ├── Model State
+│   ├── Model Version
+│   ├── Snapshot
+│   ├── Transaction
+│   ├── Change Record
+│   └── Model History
+│
+├── 12. REVISION TREE
+│   │
+│   ├── Revision
+│   ├── Change Set
+│   ├── Change Record
+│   ├── Revision Status
+│   ├── Approval State
+│   ├── Issuance
+│   └── Supersession
+│
+├── 13. VIEW TREE
+│   │
+│   ├── Plan
+│   ├── Elevation
+│   ├── Section
+│   ├── Detail
+│   ├── 3D View
+│   ├── Isometric
+│   └── Analytical View
+│
+├── 14. DRAWING TREE
+│   │
+│   ├── Drawing
+│   │   ├── Viewports
+│   │   ├── Geometry
+│   │   ├── Dimensions
+│   │   ├── Annotations
+│   │   ├── Symbols
+│   │   └── References
+│   │
+│   └── Drawing Coordination
+│       ├── Model ↔ Drawing
+│       ├── Drawing ↔ Drawing
+│       └── Revision ↔ Drawing
+│
+├── 15. DOCUMENTATION TREE
+│   │
+│   ├── Sheet
+│   ├── Sheet Template
+│   ├── Title Block
+│   ├── Drawing Index
+│   ├── Schedules
+│   ├── Notes
+│   ├── Specifications
+│   └── Document Sets
+│
+├── 16. DIMENSION / ANNOTATION TREE
+│   │
+│   ├── Dimensions
+│   │   ├── Linear
+│   │   ├── Angular
+│   │   ├── Radial
+│   │   └── Elevation
+│   │
+│   ├── Annotations
+│   ├── Tags
+│   ├── Leaders
+│   ├── Callouts
+│   ├── Section Markers
+│   └── Detail Markers
+│
+├── 17. SCHEDULE TREE
+│   │
+│   ├── Space Schedules
+│   ├── Door Schedules
+│   ├── Window Schedules
+│   ├── Element Schedules
+│   ├── Equipment Schedules
+│   ├── Finish Schedules
+│   └── Custom Schedules
+│
+├── 18. REDLINE TREE
+│   │
+│   ├── Redline
+│   ├── Markup
+│   ├── Comment
+│   ├── Assignment
+│   ├── Resolution
+│   └── Verification
+│
+├── 19. EXPORT TREE
+│   │
+│   ├── Native Model
+│   ├── JSON
+│   ├── SVG
+│   ├── DXF
+│   ├── PDF
+│   ├── IFC / BIM
+│   ├── Schedules
+│   └── Document Packages
+│
+├── 20. APPLICATION TREE
+│   │
+│   ├── Web Application
+│   │   ├── Command Console
+│   │   ├── Project Browser
+│   │   ├── Model Viewer
+│   │   ├── Drawing Editor
+│   │   ├── Sheet Editor
+│   │   ├── Properties
+│   │   ├── Schedules
+│   │   ├── Revisions
+│   │   └── Redlines
+│   │
+│   ├── API
+│   └── Worker
+│
+├── 21. SERVICE TREE
+│   │
+│   ├── Project Service
+│   ├── Model Service
+│   ├── Geometry Service
+│   ├── Drawing Service
+│   ├── Documentation Service
+│   ├── Revision Service
+│   ├── Code Service
+│   ├── AI Service
+│   └── Export Service
+│
+├── 22. DATA TREE
+│   │
+│   ├── Database
+│   ├── Schema
+│   ├── Migrations
+│   ├── Seed Data
+│   ├── Object Storage
+│   ├── Model Snapshots
+│   └── Document Storage
+│
+├── 23. SECURITY TREE
+│   │
+│   ├── Authentication
+│   ├── Authorization
+│   ├── Organization Isolation
+│   ├── Project Permissions
+│   ├── Audit Records
+│   ├── Secrets
+│   └── Data Protection
+│
+├── 24. INTEGRATION TREE
+│   │
+│   ├── AI Providers
+│   ├── BIM
+│   ├── CAD
+│   ├── GIS
+│   ├── Code / Standards Sources
+│   ├── Document Systems
+│   └── External APIs
+│
+├── 25. TEST TREE
+│   │
+│   ├── Domain Tests
+│   ├── Geometry Tests
+│   ├── Model Tests
+│   ├── Drawing Tests
+│   ├── API Tests
+│   ├── Revision Tests
+│   ├── Code Tests
+│   └── Integration Tests
+│
+├── 26. DEPLOYMENT TREE
+│   │
+│   ├── Development
+│   ├── Test
+│   ├── Staging
+│   ├── Production
+│   ├── Containers
+│   ├── Database
+│   ├── Workers
+│   └── Monitoring
+│
+└── 27. OUTPUT — THE DOCUMENTED BUILDING
+    │
+    ├── Requirements
+    ├── Design
+    ├── Analysis
+    ├── Coordination
+    ├── Drawings
+    ├── Schedules
+    ├── Specifications
+    ├── Revisions
+    ├── Compliance Records
+    └── Production Documentation
