@@ -1,0 +1,351 @@
+ONEDRAFT
+CAD-AI — Aria Powered
+Standards, Architectural Graphics & CAD Interoperability Specifications
+Version 1.0
+Document: OneDraft Standards, Architectural Graphics & CAD Interoperability Specification
+System: OneDraft CAD-AI
+Intelligence Layer: Aria
+Document Class: Architectural & Implementation Stack Specification
+Status: Architectural Specification
+Predecessor: AI Evaluation, Guardrails & Deterministic Command Verification
+Successor: Import, Export & External Data Exchange
+
+1. PURPOSE
+The Standards, Architectural Graphics & CAD Interoperability subsystem establishes the standards, architectural graphics, CAD interoperability and drawing-communication architecture of OneDraft.
+The purpose of this subsystem is to ensure that the computational Project Model, generated geometry, documentation engine, drawing sheets and externally exchanged CAD/BIM information can be represented through consistent, deterministic and professionally usable architectural graphics.
+OneDraft shall not treat CAD output as an unstructured graphical rendering. Architectural drawings are structured technical documents whose graphic conventions communicate geometry, hierarchy, materials, assemblies, dimensions, annotations, construction information and design intent.
+This subsystem therefore establishes the standards layer connecting the OneDraft Project Model and geometry engines to the documentation system, drawing-generation engine, rendering pipeline, interoperability interfaces and final project artifacts.
+The subsystem provides the controlled translation between internal model semantics and external CAD/BIM representation while preserving project identity, geometry relationships, drawing standards, provenance and interoperability metadata.
+2. ARCHITECTURAL ROLE
+The Standards and CAD Interoperability subsystem operates between the computational and documentation layers of OneDraft and the external representation formats used by professional architectural, engineering and construction workflows.
+Primary responsibility: Define and enforce the graphic and interoperability standards governing OneDraft-generated technical documentation.
+Primary inputs: Project Model, geometry, assemblies, spaces, parameters, constraints, views, drawing definitions, sheet templates, annotations, dimensions, schedules, regulatory requirements and project configuration.
+Primary outputs: Standardized drawing representations, CAD-compatible geometry, BIM-compatible representations, graphic metadata, drawing-layer structures, interoperable model references and standards-compliant project artifacts.
+Authority: The subsystem controls representation standards. It does not independently alter the authoritative Project Model.
+Determinism: Equivalent Project Model inputs and equivalent standards configuration shall produce equivalent graphic and interoperability results subject to explicitly versioned rendering and export implementations.
+3. STANDARDS ARCHITECTURE
+OneDraft shall maintain a standards architecture rather than embedding graphic conventions directly into individual drawing generators.
+The standards architecture shall define the rules governing layers, lineweights, linetypes, colors where applicable, text styles, dimension styles, annotation conventions, symbols, hatches, fills, blocks, title blocks, sheet composition, view representation and drawing hierarchy.
+Standards shall be versioned and associated with the project configuration under which a drawing is generated.
+A drawing shall therefore be reproducible from the combination of its Project Model version, drawing definition, view configuration, standards configuration and generation implementation.
+Standards shall be represented as structured configuration rather than uncontrolled application-level constants.
+4. ARCHITECTURAL GRAPHICS SYSTEM
+The Architectural Graphics System defines how OneDraft communicates architectural information visually.
+The system shall distinguish between model geometry and graphic representation.
+A wall, for example, shall remain an architectural model element independent of whether it is represented as a cut element in plan, a projected element in elevation, a profile in section or a simplified representation in a diagram.
+Graphic representation shall therefore be view-dependent.
+Model representation: Authoritative computational representation of the architectural element.
+View representation: Transformation of model information into the geometric and graphic context required for a particular drawing view.
+Graphic representation: Application of lineweight, linetype, annotation, hatching, fill, symbol and visibility rules to the view representation.
+Sheet representation: Placement and composition of the resulting drawing within a formal drawing sheet.
+This separation permits the same Project Model to produce multiple coordinated drawing representations without duplicating or corrupting the underlying model.
+5. DRAWING GRAPHIC HIERARCHY
+OneDraft shall maintain a formal graphic hierarchy.
+Graphic hierarchy shall communicate the relative importance of elements within a drawing and shall remain consistent across the project documentation set.
+The hierarchy shall account for cut elements, projected elements, overhead elements, background elements, reference geometry, dimensions, annotations, symbols, grids and other documentation information.
+Lineweight shall be treated as semantic drawing information rather than merely a visual styling preference.
+The drawing-generation engine shall derive graphic hierarchy from the applicable view type, element classification, representation state and project standards.
+6. LAYERS
+CAD layer structures shall be generated from controlled OneDraft semantic classifications.
+Layer assignment shall not be based solely upon arbitrary element names.
+The system shall maintain a mapping between Project Model classifications and external CAD layer structures.
+Layer identifier: Stable external representation identifier.
+Layer name: Human-readable standards-defined layer name.
+Layer purpose: Semantic description of the information represented by the layer.
+Visibility state: Controlled visibility of the layer within the applicable drawing or exported artifact.
+Graphic properties: Standards-defined properties associated with the layer.
+Source classification: OneDraft model classification from which the layer is derived.
+Layer mappings shall be versioned.
+Changes to layer standards shall not silently rewrite historical artifacts.
+7. LINEWEIGHT AND LINETYPE SYSTEM
+OneDraft shall provide a centralized lineweight and linetype system.
+Lineweight selection shall be determined by drawing semantics, view context and standards configuration.
+The system shall support distinctions including, but not limited to, primary cut geometry, secondary cut geometry, projected geometry, overhead geometry, hidden geometry, reference geometry, dimensions, leaders, grids and annotations.
+Linetype definitions shall likewise be centrally controlled.
+The system shall prevent individual drawing-generation routines from independently inventing incompatible lineweight or linetype conventions.
+8. TEXT AND ANNOTATION STANDARDS
+Text shall be generated through standardized text styles.
+Text styles shall define the properties required for consistent architectural documentation, including typeface configuration, size, spacing, alignment, orientation and annotation behavior.
+Annotation shall remain associated with the semantic object, view or drawing context to which it belongs.
+Where practical, annotations shall maintain references to their source Project Model objects or documentation objects.
+This permits annotation regeneration following controlled model changes.
+9. DIMENSION STANDARDS
+Dimensions shall be treated as structured documentation objects.
+A dimension shall contain sufficient information to identify its measured references, geometric basis, displayed value, formatting rules and drawing context.
+Dimensions shall not become untracked static graphics merely because they are exported to CAD.
+Where a dimension is derived from authoritative model geometry, the system shall preserve its relationship to that geometry within the OneDraft documentation model.
+Dimension values shall be generated from authoritative geometry rather than independently authored text whenever the dimension represents measurable project geometry.
+10. SYMBOLS AND GRAPHIC LIBRARIES
+OneDraft shall maintain standardized architectural symbols and reusable graphic definitions.
+Symbols may include architectural markers, section indicators, elevation indicators, detail references, north arrows, room identifiers, material symbols, grid indicators and other documentation elements.
+Symbol definitions shall be versioned and associated with standards configuration.
+Symbols shall support consistent insertion, scaling, orientation and metadata preservation across drawings and export formats.
+Project-specific symbols shall be distinguishable from system-standard symbols.
+11. HATCHING AND MATERIAL GRAPHICS
+Hatches, fills and material graphics shall be generated from semantic classifications.
+A material or assembly shall be capable of receiving different graphic representations depending upon drawing type and view context.
+For example, a wall assembly may require a cut hatch in a section while requiring a simplified graphic representation in plan.
+Material graphics shall therefore remain separate from the underlying material identity.
+The system shall prevent graphical hatch definitions from becoming the authoritative representation of assemblies or materials.
+12. VIEW REPRESENTATION
+Every generated drawing shall contain an explicit view context.
+View context shall determine which model information is visible, how geometry is projected, which elements are cut, which elements are projected and which graphic standards apply.
+Plan view: Horizontal projection of the model with defined cut-plane behavior.
+Elevation view: Vertical projection relative to a defined orientation.
+Section view: Vertical cut through a defined section plane.
+Detail view: Enlarged representation of a defined model or documentation region.
+3D view: Spatial representation of model geometry under a defined camera and representation state.
+Diagrammatic view: Controlled representation intended to communicate relationships or systems rather than direct construction geometry.
+View definitions shall be stored as structured objects within the documentation architecture.
+13. SHEET AND TITLE BLOCK STANDARDS
+OneDraft shall maintain controlled sheet templates.
+A sheet template shall define the formal composition of the drawing sheet, including page size, drawing area, title block, project information, sheet identification, revision information and standards metadata.
+Sheet templates shall support project-specific configuration while retaining the integrity of the underlying standards system.
+Generated sheets shall contain sufficient metadata to identify the Project Model version, drawing version, standards version and generation context from which the sheet was produced.
+14. ARCH D AND PROFESSIONAL DRAWING FORMATS
+OneDraft shall support architectural sheet formats required by the product's drafting workflows.
+ARCH D shall be supported as a first-class sheet configuration for architectural drawing production.
+The system shall permit additional sheet sizes and professional documentation formats through configuration rather than requiring architectural changes to the drawing engine.
+Sheet dimensions shall be represented as explicit model configuration.
+The sheet system shall maintain consistent margins, title-block placement, drawing scales, viewports and annotation behavior.
+15. CAD INTEROPERABILITY ARCHITECTURE
+OneDraft shall provide an interoperability abstraction between its internal Project Model and external CAD systems.
+External CAD representations shall be considered exchange representations rather than replacements for the authoritative OneDraft model.
+The interoperability architecture shall support controlled translation of geometry, layers, blocks, dimensions, annotations, metadata and other supported drawing structures.
+Authoritative model: OneDraft Project Model.
+Exchange model: External representation generated from or imported into OneDraft.
+Translation layer: Controlled transformation between internal and external representations.
+Interoperability manifest: Record identifying the source model, destination format, standards configuration, translator version and transformation state.
+16. DXF AND DWG INTEROPERABILITY
+OneDraft shall provide an abstraction capable of supporting DXF and DWG workflows.
+The implementation shall isolate format-specific behavior from the core Project Model.
+DXF/DWG exporters shall translate supported OneDraft geometry and drawing structures into the corresponding CAD representation.
+Where the target format cannot represent a native OneDraft object or relationship directly, the system shall apply a documented translation rule.
+Unsupported or degraded representations shall be recorded in the export result rather than silently discarded.
+17. IFC AND BIM INTEROPERABILITY
+OneDraft shall support interoperability with BIM exchange workflows through an IFC-compatible representation layer.
+The IFC interoperability architecture shall map OneDraft semantic objects into appropriate BIM concepts while preserving identifiers and relationships where the target representation supports them.
+The BIM exchange layer shall not redefine the OneDraft domain model.
+Instead, it shall provide a standards-controlled translation between the authoritative Project Model and an external BIM information model.
+The system shall identify objects that cannot be faithfully represented through the selected exchange schema.
+18. OBJECT IDENTITY AND INTEROPERABILITY REFERENCES
+External objects shall maintain traceable identity where technically possible.
+An exported object shall be associated with its originating OneDraft object through stable identifiers or interoperability metadata.
+This permits external artifacts to be correlated with the originating Project Model.
+Imported objects shall likewise receive controlled internal identity rather than being treated as anonymous geometry.
+Identity mapping shall be recorded as part of the import or export operation.
+19. GRAPHIC STANDARDS VERSIONING
+Graphic standards shall be versioned independently from individual drawings.
+A project shall reference a specific standards configuration.
+Changes to standards shall result in a new standards version rather than silently modifying historical standards.
+A generated drawing shall therefore be reproducible against the standards configuration under which it was created.
+Standards Version: Immutable identifier for a standards configuration.
+Effective Date: Date from which the standards configuration is intended to apply.
+Predecessor Version: Prior standards configuration from which the current configuration derives.
+Change Record: Structured record describing changes between standards configurations.
+20. PROJECT-SPECIFIC STANDARDS
+OneDraft shall support project-specific standards without compromising the global standards architecture.
+Projects may override configurable standards properties where permitted by the applicable configuration policy.
+Overrides shall be explicit, versioned and attributable.
+The system shall distinguish between global defaults, organization standards, project standards and drawing-specific settings.
+A project-specific override shall never silently modify the underlying global standard.
+21. STANDARDS RESOLUTION
+Standards resolution shall occur through a deterministic hierarchy.
+The applicable standard shall be resolved from the project context, organization configuration, project configuration, drawing type, view type and explicitly authorized overrides.
+The resolved configuration shall become part of the drawing-generation context.
+The system shall retain the resolved standards identity with the resulting artifact.
+22. DRAWING COORDINATION
+CAD interoperability shall preserve drawing coordination.
+Common references including grids, levels, model coordinates, project origins and shared geometry shall remain consistent across exported drawings.
+A drawing export shall not independently redefine project coordinates unless the transformation is explicitly configured and recorded.
+Coordinate transformations shall be deterministic and documented.
+This requirement ensures that separately exported plans, elevations, sections and details remain spatially coordinated when reassembled in an external CAD environment.
+23. UNITS AND PRECISION
+OneDraft shall maintain explicit project units and precision rules.
+Units shall be part of the Project Model and standards context.
+External CAD and BIM exports shall apply controlled unit conversion when the target format requires different units.
+Conversion shall not alter authoritative internal geometry.
+The system shall retain sufficient precision to prevent accumulated conversion error from producing meaningful project-coordinate discrepancies.
+24. SCALE MANAGEMENT
+Drawing scale shall be a property of the drawing view and sheet context rather than an arbitrary graphical multiplier.
+The documentation engine shall determine appropriate representation behavior from the selected scale.
+Text, dimensions, symbols, lineweights and other annotation-dependent graphics shall respond consistently to scale configuration.
+Exported CAD representations shall preserve the intended geometric scale.
+25. MODEL SPACE AND PAPER SPACE REPRESENTATION
+Where the target CAD format supports model-space and paper-space concepts, OneDraft shall provide a controlled mapping.
+Model geometry shall remain represented in the appropriate project coordinate environment.
+Sheet composition shall be represented through layouts, viewports or equivalent target-format structures where supported.
+The translation layer shall prevent sheet graphics from corrupting the underlying model coordinate system.
+26. INTEROPERABILITY LOSS DETECTION
+The interoperability engine shall detect information loss during translation.
+Information loss may include unsupported geometry, unsupported object types, unsupported metadata, degraded annotations, unsupported constraints or format-specific limitations.
+The export process shall produce structured warnings or validation results for such conditions.
+Silent loss of authoritative project information shall be prohibited.
+27. IMPORT/EXPORT MANIFEST
+Every controlled interoperability operation shall produce an interoperability manifest.
+The manifest shall identify the source, destination, format, standards configuration, translator implementation, Project Model version and resulting artifact.
+Source Model Version: Project Model version used for translation.
+Source Artifact: Input artifact, where applicable.
+Target Format: External representation format.
+Standards Version: Standards configuration used during translation.
+Translator Version: Implementation version responsible for the translation.
+Transformation: Coordinate, unit or structural transformations applied.
+Warnings: Detected interoperability limitations.
+Result Hash: Integrity identifier for the resulting artifact.
+28. INTEGRITY AND PROVENANCE
+Generated CAD and BIM artifacts shall participate in the OneDraft provenance architecture established by the data lifecycle and provenance subsystem.
+Artifacts shall retain references to their originating model and generation context.
+Hashes shall be generated for controlled artifacts.
+The interoperability subsystem shall therefore provide traceability from an external CAD/BIM artifact back toward the OneDraft generation context whenever the available format permits such preservation.
+29. VALIDATION OF EXPORTED DRAWINGS
+Exported drawings shall pass deterministic interoperability validation before being considered complete.
+Validation shall verify supported geometry, coordinate consistency, units, layer assignments, drawing structure, standards application and artifact integrity.
+Where validation identifies a condition that prevents reliable exchange, the export operation shall be marked accordingly.
+An exported artifact shall not be represented as fully interoperable merely because a file was successfully written.
+30. INTEROPERABILITY WITH THE DOCUMENTATION ENGINE
+The Standards and CAD Interoperability subsystem shall integrate directly with the Documentation & Drawing Generation Engine.
+The Documentation & Drawing Generation Engine remains responsible for generating drawing content.
+The Standards and CAD Interoperability subsystem supplies the standards and external representation rules governing that content.
+This separation permits the documentation engine to remain focused on document generation while the standards subsystem maintains graphic consistency and interoperability.
+31. INTEROPERABILITY WITH THE PROJECT MODEL
+The subsystem shall consume the Project Model established by the computational architecture.
+The subsystem shall not become an alternative source of architectural truth.
+Geometry, spaces, assemblies, elements, grids, levels and relationships shall originate from the authoritative Project Model or explicitly defined documentation objects.
+External CAD geometry imported into OneDraft shall enter through controlled import workflows and shall be converted into appropriate Project Model representations where supported.
+32. INTEROPERABILITY WITH COMPLIANCE AND VALIDATION
+Generated drawings and external representations shall remain subject to the validation architecture established by the compliance and validation subsystems.
+The standards subsystem shall preserve the information necessary for downstream validation.
+Graphic representation shall not be treated as proof of compliance.
+Compliance remains determined through the regulatory and validation systems.
+33. INTEROPERABILITY WITH ARIA
+Aria may interact with standards through structured commands and configuration requests.
+Aria shall not directly mutate standards definitions through uncontrolled natural-language interpretation.
+Any standards-changing command shall pass through the deterministic command architecture established by the AI evaluation and command-verification subsystem.
+Aria may propose standards changes, drawing-standard selections or interoperability operations.
+The deterministic system shall resolve, validate and execute the resulting operation.
+34. STANDARDIZED COMMANDS
+The subsystem shall expose structured commands for standards and interoperability operations.
+Representative commands include standards retrieval, standards selection, standards validation, layer assignment, graphic-style resolution, CAD export, BIM export, interoperability validation and standards comparison.
+Each command shall have a defined schema, authorization boundary and validation pathway.
+35. ERROR HANDLING
+Interoperability errors shall be classified according to their effect on the resulting artifact.
+Errors shall distinguish between recoverable translation issues, unsupported representations, validation failures, configuration conflicts and critical integrity failures.
+The system shall preserve the original error context and identify the affected artifact or model object where possible.
+36. AUDITABILITY
+Standards changes, interoperability operations and externally generated artifacts shall be auditable.
+Audit records shall identify the actor or process initiating the operation, the source configuration, resulting configuration, execution time, affected project and resulting artifacts.
+Privileged standards changes shall be subject to the identity, access-control and authorization architecture.
+37. SECURITY BOUNDARIES
+External CAD and BIM files shall be treated as untrusted external data.
+Import processing shall occur through controlled application boundaries.
+External content shall not receive authority to execute arbitrary application behavior.
+File parsing, translation and artifact processing shall operate within the security and infrastructure controls established by the broader OneDraft architecture.
+38. PERFORMANCE REQUIREMENTS
+The standards subsystem shall support efficient generation of large drawing sets.
+Standards resolution shall be cacheable where the underlying configuration is immutable.
+Reusable symbols, graphic definitions and style definitions shall be reusable rather than repeatedly reconstructed.
+Large CAD/BIM translations shall be eligible for asynchronous execution through the OneDraft job and worker execution system.
+39. VERSION CONTROL
+All standards definitions, graphic libraries, interoperability mappings and translation implementations shall be version controlled.
+A drawing artifact shall identify the versions necessary to understand its generation context.
+Changes to standards shall be additive and traceable wherever practical.
+Historical artifacts shall remain interpretable against their recorded standards configurations.
+40. IMPLEMENTATION ARCHITECTURE
+The implementation shall separate standards concerns into independently testable components.
+The principal implementation components shall include:
+Standards Registry: Stores versioned standards configurations.
+Graphic Rules Engine: Resolves graphic properties from semantic and view context.
+Layer Mapping Service: Maps internal classifications to external CAD layers.
+Symbol Library: Provides controlled architectural symbols and graphic definitions.
+Annotation Standards Service: Resolves text, dimension and annotation styles.
+View Representation Service: Produces view-dependent graphic representations.
+CAD Translation Layer: Converts supported OneDraft representations to external CAD structures.
+BIM Translation Layer: Converts supported OneDraft representations to external BIM structures.
+Interoperability Validator: Detects translation defects and unsupported information.
+Manifest Service: Produces provenance and integrity metadata for interoperability operations.
+41. DATA MODEL REQUIREMENTS
+The domain model shall support standards entities sufficient to represent the subsystem.
+Representative entities include:
+StandardSet
+StandardVersion
+GraphicRule
+LayerDefinition
+LinetypeDefinition
+LineweightDefinition
+TextStyle
+DimensionStyle
+SymbolDefinition
+HatchDefinition
+SheetTemplate
+ViewStyle
+InteroperabilityMapping
+ExportProfile
+ImportProfile
+InteroperabilityManifest
+TranslationResult
+StandardsOverride
+These entities shall integrate with the existing Project, Drawing, Sheet, View, Annotation, Dimension and Artifact structures.
+42. API REQUIREMENTS
+The API shall expose controlled resources for standards retrieval, standards selection, validation, graphic configuration and interoperability operations.
+Representative endpoints shall support:
+GET /standards
+GET /standards/{id}
+GET /standards/{id}/versions
+POST /projects/{id}/standards
+POST /drawings/{id}/validate-standards
+POST /projects/{id}/exports/cad
+POST /projects/{id}/exports/bim
+POST /artifacts/{id}/validate-interoperability
+The final API contract shall be governed by the established OpenAPI architecture and subsequent executable application stacks.
+43. TESTING REQUIREMENTS
+The subsystem shall be tested through unit, integration, contract, regression and end-to-end testing.
+Tests shall verify deterministic standards resolution, layer mapping, graphic rules, dimensions, annotations, symbols, coordinate transformations, unit conversion, CAD export, BIM export and interoperability validation.
+Golden-file testing shall be used where appropriate for generated drawing artifacts.
+Changes to graphic standards shall trigger appropriate regression testing against representative project documentation.
+44. OBSERVABILITY
+Standards and interoperability operations shall emit structured telemetry consistent with the OneDraft observability architecture.
+Telemetry shall capture operation identity, project identity, standards version, translator version, execution duration, artifact size, validation status and failure classification.
+The system shall provide sufficient diagnostic information to identify whether a failure originated in the Project Model, graphic resolution, translation layer, target-format limitations or artifact processing.
+45. DEPLOYMENT
+The subsystem shall operate within the OneDraft application and worker architecture.
+Interactive standards resolution may occur synchronously.
+Large export and translation operations shall execute through the asynchronous job system.
+Generated artifacts shall be stored through the Artifact & Storage Management Engine and governed by the Data Lifecycle, Retention & Provenance System.
+46. CONFIGURATION
+Standards configuration shall be environment-independent wherever possible.
+Runtime configuration shall control implementation behavior, while project standards shall remain project-domain data.
+Secrets and environment-specific credentials shall remain governed by the Configuration, Secrets & Environment Management subsystem.
+Standards themselves shall not be stored as undocumented environment variables.
+47. ACCEPTANCE CRITERIA
+The subsystem shall be considered implemented when OneDraft can maintain versioned architectural graphic standards, apply those standards deterministically to generated drawings, produce consistent CAD-compatible representations, preserve project coordinates and units, maintain object and artifact provenance, detect interoperability loss and validate exported artifacts.
+The implementation shall demonstrate that the same authoritative Project Model can produce coordinated drawings while maintaining consistent graphic conventions across the documentation set.
+48. SYSTEM INTEGRATION
+The Standards, Architectural Graphics & CAD Interoperability subsystem integrates directly with the preceding OneDraft architecture.
+Computational Project Model and Geometry: Supplies computational geometry and parametric model information.
+Compliance and Validation: Supplies regulatory and validation context.
+Documentation & Drawing Generation: Generates architectural documentation.
+Review and Acceptance: Provides review and acceptance context.
+Runtime, Jobs, Artifacts and Events: Provides orchestration, asynchronous execution, artifact storage and events.
+Identity and Security: Provides identity, authorization and security boundaries.
+Operations and Data Governance: Provides observability, testing, deployment, configuration, recovery and provenance.
+Aria Intelligence and Command Verification: Provides AI intelligence and deterministic command verification.
+External Data Exchange: Extends the interoperability foundation into controlled ingestion and exchange of survey information, existing CAD/BIM models, PDFs, images, specifications and other external project data.
+49. ARCHITECTURAL INVARIANTS
+The following invariants shall govern the Standards, Architectural Graphics & CAD Interoperability subsystem.
+Project Model Authority: External CAD/BIM representations shall not replace the authoritative OneDraft Project Model.
+Standards Versioning: Graphic standards shall be versioned and traceable.
+Deterministic Representation: Equivalent inputs and equivalent standards shall produce equivalent representations.
+No Silent Loss: Unsupported or degraded external representations shall be identified.
+Coordinate Integrity: Project coordinates shall remain controlled and traceable.
+Unit Integrity: Unit conversions shall be explicit and deterministic.
+Provenance: Generated external artifacts shall remain traceable to their originating OneDraft context.
+Security: External files shall be treated as untrusted input.
+Authorization: Standards-changing operations shall pass through the established security and command-verification architecture.
+Separation of Concerns: Graphic representation shall not become the authoritative architectural model.
+50. COMPLETION STATUS
+The Standards, Architectural Graphics & CAD Interoperability subsystem establishes the OneDraft standards-controlled representation layer required to convert the authoritative OneDraft Project Model into professional architectural documentation and interoperable CAD/BIM representations.
+The subsystem provides a controlled standards architecture connecting computational geometry, documentation generation and external CAD/BIM representation.
+The next architectural layer extends this interoperability foundation into controlled import, export and exchange of survey information, existing CAD/BIM models, PDFs, images, specifications and other external project data.
+Status: ARCHITECTURALLY DEFINED
+Next Document: Import, Export & External Data Exchange
+Overall Architecture: OneDraft End-to-End System Integration
