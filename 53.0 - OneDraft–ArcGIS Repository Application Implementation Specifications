@@ -1,0 +1,1845 @@
+ONEDRAFT
+CAD-AI — Aria Powered
+OneDraft–ArcGIS Repository Application Implementation Specifications
+Version 1.0
+Document: OneDraft–ArcGIS Repository Application Implementation Specification
+System: OneDraft CAD-AI
+Intelligence Layer: Aria
+Document Class: Architectural & Implementation Stack Specification
+Status: Implementation Specification
+Predecessor: Global Geospatial Application, Repository & World-Model Implementation Architecture
+Successor: To Be Determined by Implementation Requirements
+
+1. PURPOSE
+Stack 53.0 defines the executable implementation architecture required to connect the OneDraft platform to authorized ArcGIS repositories and services.
+Stack 52.0 established the Global Geospatial Application, Repository & World-Model architecture.
+Stack 53.0 converts that architecture into an implementation specification governing:
+ArcGIS connectivity
+Repository integration
+GIS dataset registration
+Spatial data ingestion
+Spatial data normalization
+Feature and layer management
+Coordinate-reference management
+Spatial synchronization
+Project georeferencing
+Authorized repository write-back
+Spatial provenance
+Version management
+Conflict management
+API integration
+Job execution
+Database persistence
+Security
+Testing
+Deployment
+The objective is to establish a concrete implementation boundary between the OneDraft application and external ArcGIS infrastructure while preserving OneDraft as an independent architectural and engineering platform.
+
+2. IMPLEMENTATION OBJECTIVE
+The objective of Stack 53.0 is to provide the executable system required to establish:
+ONEDRAFT
+   ↓
+GEOSPATIAL APPLICATION
+   ↓
+ARCGIS ADAPTER
+   ↓
+ARCGIS SERVICES
+   ↓
+ARCGIS REPOSITORY
+and the reverse information path:
+ARCGIS REPOSITORY
+   ↓
+ARCGIS ADAPTER
+   ↓
+INGESTION
+   ↓
+NORMALIZATION
+   ↓
+VALIDATION
+   ↓
+ONEDRAFT SPATIAL MODEL
+   ↓
+PROJECT / SITE / STRUCTURE
+The implementation shall support controlled bidirectional interaction without collapsing the distinction between external GIS information and canonical OneDraft project information.
+
+3. IMPLEMENTATION PRINCIPLE
+The primary implementation principle shall be:
+ARCGIS
+PROVIDES EXTERNAL GEOSPATIAL DATA
+        ↓
+ONEDRAFT
+PROVIDES ENGINEERING / PROJECT CONTEXT
+        ↓
+ARIA
+PROVIDES INTELLIGENT ORCHESTRATION
+        ↓
+VALIDATION
+PROVIDES DETERMINISTIC CONTROL
+        ↓
+REPOSITORY
+PROVIDES PERSISTENT SPATIAL CONTINUITY
+No subsystem shall assume that another subsystem is authoritative outside its defined domain.
+
+4. SYSTEM BOUNDARY
+Stack 53.0 establishes the following implementation boundary:
+┌─────────────────────────────────────────────┐
+│                 ONEDRAFT                    │
+│                                             │
+│  Project Model                              │
+│  Spatial Model                              │
+│  Geometry Engine                            │
+│  Compliance                                 │
+│  Validation                                 │
+│  Documentation                              │
+│  Aria                                       │
+│  Repository                                 │
+│                                             │
+└──────────────────┬──────────────────────────┘
+                   │
+             GIS ADAPTER LAYER
+                   │
+┌──────────────────┴──────────────────────────┐
+│                  ARCGIS                     │
+│                                             │
+│  Services                                   │
+│  Layers                                     │
+│  Feature Data                               │
+│  Geographic Datasets                        │
+│  External Spatial Resources                 │
+│                                             │
+└─────────────────────────────────────────────┘
+The adapter layer shall isolate the OneDraft domain from provider-specific implementation details.
+
+5. ARCGIS ADAPTER
+The ArcGIS Adapter shall be the primary integration boundary between OneDraft and ArcGIS services.
+The adapter shall provide normalized OneDraft interfaces for:
+Dataset discovery
+Layer discovery
+Feature queries
+Spatial queries
+Metadata retrieval
+Feature retrieval
+Feature creation where authorized
+Feature updates where authorized
+Synchronization
+Service health
+The application shall not distribute ArcGIS-specific logic throughout the OneDraft domain layer.
+
+6. PROVIDER ABSTRACTION
+The implementation shall use a provider abstraction.
+SpatialProvider
+      │
+ ┌────┼────────────┐
+ │    │            │
+ArcGIS Provider   Future Providers
+ArcGIS shall be the first implementation.
+Future providers shall be capable of connecting through the same spatial-provider contract.
+
+7. ARCGIS SERVICE REGISTRY
+OneDraft shall maintain an internal registry of authorized ArcGIS services.
+A service registration shall include:
+ArcGISService
+ ├── id
+ ├── provider
+ ├── service_url
+ ├── service_type
+ ├── owner
+ ├── access_policy
+ ├── spatial_reference
+ ├── status
+ ├── metadata
+ └── synchronization_policy
+Service credentials shall never be stored directly within ordinary domain records.
+
+8. DATASET REGISTRY
+The Dataset Registry shall maintain the canonical OneDraft record describing an external GIS dataset.
+The registry shall contain:
+Dataset identifier
+Provider
+Service
+Layer
+Dataset name
+Source
+Description
+Spatial reference
+Version
+Acquisition timestamp
+Last synchronization
+License
+Access classification
+Provenance
+Status
+
+9. LAYER REGISTRY
+Individual ArcGIS layers shall be represented independently of datasets.
+DATASET
+   ↓
+SERVICE
+   ↓
+LAYER
+   ↓
+FEATURES
+Layer metadata shall include:
+Layer identifier
+Layer name
+Geometry type
+Spatial reference
+Fields
+Capabilities
+Extent
+Source
+Version
+The layer registry shall permit OneDraft to discover the structure of external geographic information without importing all underlying data.
+
+10. FEATURE REPRESENTATION
+External ArcGIS features shall be represented through a normalized spatial feature model.
+SpatialFeature
+ ├── external_id
+ ├── geometry
+ ├── attributes
+ ├── source
+ ├── dataset
+ ├── layer
+ ├── spatial_reference
+ ├── timestamp
+ └── provenance
+External identifiers shall remain available after normalization.
+
+11. CANONICAL SPATIAL MODEL
+ArcGIS feature data shall be converted into the canonical OneDraft spatial model before becoming part of project context.
+ARCGIS FEATURE
+      ↓
+ADAPTER
+      ↓
+NORMALIZATION
+      ↓
+CANONICAL SPATIAL ENTITY
+The canonical model shall remain provider-neutral.
+
+12. SPATIAL REFERENCE IMPLEMENTATION
+The integration shall explicitly identify the coordinate reference system associated with every imported geometry.
+The implementation shall preserve:
+Source CRS
+Target CRS
+Transformation
+Units
+Precision
+Transformation timestamp
+No geometry shall be silently transformed without recording its transformation context.
+
+13. COORDINATE TRANSFORMATION SERVICE
+The Coordinate Transformation Service shall perform all supported geographic transformations.
+SOURCE GEOMETRY
+      ↓
+SOURCE CRS
+      ↓
+TRANSFORMATION
+      ↓
+TARGET CRS
+      ↓
+ONEDRAFT GEOMETRY
+The service shall be independently testable.
+
+14. ARCGIS DISCOVERY WORKFLOW
+The implementation shall support controlled discovery.
+SERVICE
+ ↓
+DATASET
+ ↓
+LAYER
+ ↓
+METADATA
+ ↓
+FEATURE QUERY
+Discovery shall occur before bulk ingestion.
+This permits OneDraft to determine what external information exists before determining what information should be imported.
+
+15. DATASET INGESTION PIPELINE
+The implementation shall provide:
+DISCOVER
+ ↓
+REGISTER
+ ↓
+RETRIEVE
+ ↓
+PARSE
+ ↓
+VALIDATE
+ ↓
+NORMALIZE
+ ↓
+PROVENANCE
+ ↓
+PERSIST
+ ↓
+INDEX
+Each stage shall produce explicit success or failure state.
+
+16. FEATURE INGESTION
+Feature ingestion shall process external geographic features individually or in controlled batches.
+The ingestion service shall support:
+Geometry
+Attributes
+External identifiers
+Dataset identifiers
+Layer identifiers
+Spatial references
+Source timestamps
+Provenance
+Batch operations shall be resumable where practical.
+
+17. ATTRIBUTE MAPPING
+External attributes shall be mapped through explicit schemas.
+ARCGIS FIELD
+     ↓
+FIELD MAPPING
+     ↓
+ONEDRAFT ATTRIBUTE
+Unknown fields shall not automatically be discarded.
+Where appropriate, they shall remain available as source attributes.
+
+18. SCHEMA MAPPING REGISTRY
+The system shall maintain mappings between external and canonical schemas.
+A mapping shall define:
+Source field
+Target field
+Data type
+Transformation
+Validation
+Required state
+Version
+Schema mappings shall be version controlled.
+
+19. GEOMETRY NORMALIZATION
+The implementation shall normalize supported geometry types.
+Examples include:
+Point
+Multipoint
+Line
+Polyline
+Polygon
+Multipolygon
+Geometry collections where supported
+Normalization shall preserve geometric meaning.
+
+20. GEOMETRY VALIDATION
+Every imported geometry shall pass validation appropriate to its geometry type.
+Validation shall detect:
+Invalid coordinates
+Malformed geometry
+Self-intersection where applicable
+Invalid rings
+Unsupported geometry
+Coordinate-reference mismatch
+Topology problems
+Invalid records shall enter explicit failure or quarantine state.
+
+21. SPATIAL INDEXING
+Imported spatial entities shall be spatially indexed.
+The index shall support:
+Point lookup
+Bounding-box queries
+Polygon intersection
+Proximity
+Containment
+Nearest feature
+Project context
+Spatial indexing shall be implemented independently from the external ArcGIS service.
+
+22. POSTGRESQL SPATIAL PERSISTENCE
+The canonical spatial model shall be persisted within the OneDraft PostgreSQL architecture using an appropriate spatial extension and schema strategy.
+Conceptually:
+PostgreSQL
+ ├── projects
+ ├── sites
+ ├── structures
+ ├── spatial_entities
+ ├── spatial_datasets
+ ├── spatial_layers
+ ├── spatial_relationships
+ ├── spatial_versions
+ └── spatial_provenance
+Spatial persistence shall remain integrated with the existing OneDraft transaction model.
+
+23. EXTERNAL IDENTIFIER PRESERVATION
+Every imported external record shall preserve its source identity.
+The implementation shall support:
+Provider
++
+Service
++
+Dataset
++
+Layer
++
+External Feature ID
+This prevents duplicate records from being created during subsequent synchronization.
+
+24. DEDUPLICATION
+The ingestion service shall identify potential duplicate spatial records.
+Deduplication may consider:
+External identifier
+Dataset
+Layer
+Geometry
+Attributes
+Temporal state
+Duplicate detection shall not automatically merge records where the distinction is meaningful.
+
+25. PROJECT GEOREFERENCING
+OneDraft projects shall be georeferenced through an explicit project operation.
+PROJECT
+ ↓
+SITE
+ ↓
+GEOREFERENCE
+ ↓
+SPATIAL REGISTRATION
+ ↓
+GLOBAL PROJECT INDEX
+The operation shall persist the relationship between the project and geographic location.
+
+26. SITE REGISTRATION
+The Site Registration Service shall establish:
+Site identifier
+Project relationship
+Boundary
+Coordinate reference
+Location
+Jurisdiction
+Existing context
+Source
+The site shall become the primary spatial anchor for the architectural project.
+
+27. STRUCTURE REGISTRATION
+Existing structures may be registered independently from OneDraft projects.
+EXTERNAL STRUCTURE
+ ↓
+STRUCTURE RECORD
+ ↓
+SPATIAL INDEX
+ ↓
+OPTIONAL PROJECT LINK
+A structure shall not be assumed to be a OneDraft project merely because it is represented spatially.
+
+28. ARCGIS-TO-ONEDRAFT READ PATH
+The canonical read path shall be:
+ARCGIS
+ ↓
+SERVICE
+ ↓
+DATASET
+ ↓
+LAYER
+ ↓
+FEATURE QUERY
+ ↓
+ADAPTER
+ ↓
+NORMALIZATION
+ ↓
+VALIDATION
+ ↓
+SPATIAL MODEL
+ ↓
+PROJECT CONTEXT
+This shall be the primary external-data ingestion path.
+
+29. ONEDRAFT-TO-ARCGIS WRITE PATH
+Where write access is authorized, the write path shall be:
+ONEDRAFT
+ ↓
+VALIDATED PROJECT DATA
+ ↓
+DATA CLASSIFICATION
+ ↓
+AUTHORIZATION
+ ↓
+EXPORT MAPPING
+ ↓
+ARCGIS ADAPTER
+ ↓
+ARCGIS SERVICE
+ ↓
+AUTHORIZED REPOSITORY UPDATE
+Write-back shall never occur solely because Aria generated or modified information.
+
+30. WRITE-BACK POLICY
+Repository write-back shall require:
+Valid project state
+Explicit data classification
+Authorized destination
+Schema compatibility
+Validation
+Provenance
+Authorization
+The system shall distinguish between:
+LOCAL PROJECT STATE
+and:
+GLOBAL REPOSITORY STATE
+
+31. ARCGIS EDITING MODEL
+Where external ArcGIS editing is supported, OneDraft shall treat external edits as externally sourced state.
+The system shall record:
+External version
+External timestamp
+Source
+Changed fields
+Changed geometry
+Synchronization event
+The OneDraft canonical state shall not be silently overwritten.
+
+32. SYNCHRONIZATION ENGINE
+The synchronization engine shall reconcile external and internal states.
+ARCGIS STATE
+      ↓
+COMPARE
+      ↓
+CHANGE DETECTION
+      ↓
+VALIDATION
+      ↓
+RECONCILIATION
+      ↓
+ONEDRAFT STATE
+The reverse process shall apply to authorized write-back.
+
+33. CHANGE DETECTION
+The system shall detect changes using available identifiers, timestamps, versions, hashes or deterministic comparisons.
+Change states may include:
+UNCHANGED
+ADDED
+MODIFIED
+REMOVED
+SUPERSEDED
+CONFLICT
+
+34. CONFLICT MANAGEMENT
+Conflicts shall be represented explicitly.
+ONEDRAFT STATE
+      +
+ARCGIS STATE
+      ↓
+CONFLICT
+      ↓
+RESOLUTION POLICY
+      ↓
+RESOLVED STATE
+Resolution may be:
+Automatic
+Rule-based
+Human-reviewed
+Deferred
+No conflict shall be silently discarded.
+
+35. PROVENANCE IMPLEMENTATION
+Every external spatial entity shall maintain source provenance.
+The provenance record shall identify:
+Provider
+Dataset
+Layer
+Feature
+Acquisition
+Transformation
+Importer
+Version
+Timestamp
+The lineage shall remain queryable.
+
+36. HASHING
+Where applicable, source representations shall receive deterministic hashes.
+Hashes may be used to detect:
+Unchanged data
+Modified data
+Duplicate data
+Artifact changes
+Synchronization changes
+Hashes shall complement rather than replace authoritative source identifiers.
+
+37. TEMPORAL VERSIONING
+Spatial entities shall support temporal versions.
+FEATURE
+ ↓
+VERSION 1
+ ↓
+VERSION 2
+ ↓
+VERSION 3
+ ↓
+CURRENT
+Historical records shall remain distinguishable according to retention policy.
+
+38. HISTORICAL DATA MODEL
+Historical information shall not be treated as current information merely because it remains present in the repository.
+Each temporal record shall include appropriate state information:
+HISTORICAL
+EXISTING
+CURRENT
+PROPOSED
+FUTURE
+SUPERSEDED
+
+39. GLOBAL PLACEHOLDER IMPLEMENTATION
+The implementation shall support incomplete geographic records.
+PLACEHOLDER
+ ↓
+LOCATION
+ ↓
+IDENTIFIED FEATURE
+ ↓
+STRUCTURE
+ ↓
+PROJECT
+ ↓
+DETAILED MODEL
+A placeholder may therefore exist before full engineering information is available.
+
+40. GLOBAL REPOSITORY REGISTRATION
+A OneDraft project shall be capable of receiving a global spatial identifier.
+Conceptually:
+OneDraft Project ID
+        +
+Spatial ID
+        +
+Site ID
+        +
+Structure ID
+        ↓
+Global Registry Record
+Identifiers shall remain stable through the project lifecycle.
+
+41. GLOBAL PROJECT INDEX
+The Global Project Index shall support geographic discovery of authorized OneDraft projects.
+The index shall permit queries by:
+Country
+Region
+City
+Coordinates
+Site
+Project
+Structure
+Project state
+Temporal state
+
+42. GLOBAL STRUCTURE INDEX
+The Global Structure Index shall provide geographic discovery of registered structures.
+The index shall distinguish:
+Existing
+Historical
+OneDraft
+Proposed
+Unknown
+Superseded
+Structure records shall retain their source provenance.
+
+43. ARCGIS DATASET MIRRORING
+Where authorized, selected ArcGIS datasets may be represented locally within OneDraft.
+The local representation shall be a controlled mirror.
+ARCGIS
+ ↓
+AUTHORIZED DATASET
+ ↓
+LOCAL MIRROR
+ ↓
+ONEDRAFT INDEX
+Mirroring shall not imply ownership or authority over the external source.
+
+44. CACHE ARCHITECTURE
+The implementation may maintain cached spatial information for performance.
+Cache records shall have:
+Source
+Timestamp
+Expiration
+Version
+Hash
+Cached information shall not be confused with canonical project state.
+
+45. OFFLINE / DEGRADED OPERATION
+Where practical, OneDraft shall remain operational when ArcGIS services are temporarily unavailable.
+The system shall distinguish:
+ONLINE
+DEGRADED
+OFFLINE
+RECOVERING
+Cached or previously synchronized information may remain available subject to freshness policy.
+
+46. ARIA INTEGRATION
+Aria shall access ArcGIS through structured OneDraft geospatial services.
+USER
+ ↓
+ARIA
+ ↓
+GEOSPATIAL INTENT
+ ↓
+STRUCTURED COMMAND
+ ↓
+AUTHORIZATION
+ ↓
+SPATIAL SERVICE
+ ↓
+ARCGIS ADAPTER
+ ↓
+ARCGIS
+Aria shall not receive unrestricted direct credentials to external GIS systems.
+
+47. ARIA SPATIAL COMMAND MODEL
+Spatial commands shall use structured operations.
+Conceptually:
+SpatialCommand
+ ├── action
+ ├── target
+ ├── location
+ ├── dataset
+ ├── filters
+ ├── spatial_operation
+ ├── temporal_state
+ └── authorization_context
+This permits deterministic execution and validation.
+
+48. DETERMINISTIC GIS EXECUTION
+AI interpretation shall terminate before deterministic GIS execution.
+NATURAL LANGUAGE
+      ↓
+ARIA
+      ↓
+STRUCTURED COMMAND
+      ↓
+VALIDATION
+      ↓
+GIS OPERATION
+      ↓
+DETERMINISTIC RESULT
+The result shall then be returned to Aria for interpretation or presentation.
+
+49. API ARCHITECTURE
+Stack 53.0 shall expose application APIs through the existing OneDraft API Gateway.
+Example resources include:
+GET    /spatial/datasets
+GET    /spatial/datasets/{id}
+GET    /spatial/layers
+GET    /spatial/features
+GET    /spatial/entities/{id}
+GET    /spatial/search
+POST   /spatial/imports
+POST   /spatial/sync
+POST   /projects/{id}/georeference
+POST   /projects/{id}/spatial-context
+Exact routes shall be formalized through the OneDraft OpenAPI contract.
+
+50. EVENT ARCHITECTURE
+Spatial integration shall publish events through the OneDraft Event Bus.
+Events shall include:
+ArcGISServiceRegistered
+SpatialDatasetRegistered
+SpatialLayerRegistered
+SpatialImportStarted
+SpatialImportCompleted
+SpatialImportFailed
+SpatialFeatureUpdated
+SpatialSynchronizationStarted
+SpatialSynchronizationCompleted
+SpatialConflictDetected
+SpatialRepositoryUpdated
+ProjectGeoreferenced
+Events shall be versioned.
+
+51. JOB ARCHITECTURE
+Long-running ArcGIS operations shall execute through the OneDraft Job & Worker system.
+Jobs shall include:
+Dataset imports
+Bulk feature retrieval
+Spatial synchronization
+Large-area queries
+Spatial indexing
+Repository reconciliation
+Map generation
+Bulk write-back
+Each job shall provide:
+Job ID
+Status
+Progress
+Retry state
+Error state
+Result
+
+52. QUEUE ARCHITECTURE
+Spatial jobs shall enter appropriate queues.
+API
+ ↓
+JOB
+ ↓
+QUEUE
+ ↓
+WORKER
+ ↓
+ARCGIS
+ ↓
+RESULT
+ ↓
+EVENT
+Queue isolation shall prevent large GIS operations from blocking ordinary OneDraft application requests.
+
+53. RETRY POLICY
+Transient external failures shall be retried according to controlled policy.
+Retryable conditions may include:
+Temporary network failure
+Service timeout
+Rate limiting
+Temporary provider unavailability
+Non-retryable conditions shall terminate immediately with explicit failure state.
+
+54. RATE LIMITING
+The ArcGIS integration shall respect provider-specific request limits.
+The adapter shall implement:
+Request throttling
+Backoff
+Concurrency limits
+Batching
+Retry-after handling where provided
+Provider limits shall not be circumvented.
+
+55. AUTHENTICATION
+External GIS authentication shall be isolated within the integration layer.
+Credentials or tokens shall be stored using the OneDraft secrets architecture.
+The application shall support the authentication mechanisms permitted by the selected ArcGIS deployment and subscription configuration.
+Credentials shall never be persisted in ordinary project records.
+
+56. AUTHORIZATION
+ArcGIS operations shall be authorized at multiple levels:
+USER
+ ↓
+ORGANIZATION
+ ↓
+PROJECT
+ ↓
+DATASET
+ ↓
+OPERATION
+ ↓
+ARCGIS
+Authorization shall be evaluated before external modification.
+
+57. TENANT ISOLATION
+External GIS information associated with one organization shall not automatically become available to another organization.
+The spatial repository shall retain tenant context where applicable.
+Global geographic indexing shall not override project or organization access boundaries.
+
+58. DATA CLASSIFICATION
+Spatial information shall be classified before repository contribution.
+Possible classifications include:
+PUBLIC
+LICENSED
+ORGANIZATION
+PROJECT
+RESTRICTED
+PRIVATE
+Classification shall govern storage, display, synchronization and write-back.
+
+59. REPOSITORY WRITE AUTHORIZATION
+The global repository shall require an explicit authorization pathway.
+PROJECT
+ ↓
+CLASSIFICATION
+ ↓
+OWNER / AUTHORITY
+ ↓
+WRITE AUTHORIZATION
+ ↓
+VALIDATION
+ ↓
+REPOSITORY
+This ensures that project information does not become globally visible merely because it exists inside OneDraft.
+
+60. DATA RETENTION
+External spatial data shall be retained according to:
+Source requirements
+License
+Project requirements
+OneDraft retention policy
+Regulatory requirements
+Operational requirements
+Retention shall be recorded in metadata.
+
+61. LICENSE MANAGEMENT
+The Dataset Registry shall retain applicable licensing information.
+The system shall distinguish:
+Source access
+Internal use
+Derived data
+Redistribution rights
+Repository publication
+No dataset shall be redistributed beyond its permitted rights.
+
+62. EXTERNAL DATA AUTHORITY
+The system shall distinguish:
+SOURCE AUTHORITY
+from:
+ONEDRAFT DERIVED DATA
+and:
+ONEDRAFT ENGINEERING DATA
+A source may be authoritative for its own dataset while OneDraft remains authoritative for its own project model.
+
+63. DATA LINEAGE
+The complete lineage shall be:
+ARCGIS SOURCE
+ ↓
+DATASET
+ ↓
+LAYER
+ ↓
+FEATURE
+ ↓
+INGESTION
+ ↓
+TRANSFORMATION
+ ↓
+ONEDRAFT ENTITY
+ ↓
+PROJECT
+ ↓
+ENGINEERING
+ ↓
+DOCUMENTATION
+This lineage shall be persisted where required.
+
+64. REPOSITORY RECONCILIATION
+The reconciliation service shall periodically compare:
+EXTERNAL STATE
+       +
+ONEDRAFT STATE
+       ↓
+DIFFERENCE MODEL
+       ↓
+RESOLUTION
+       ↓
+SYNCHRONIZED STATE
+Reconciliation shall be observable and auditable.
+
+65. GLOBAL REPOSITORY GROWTH
+The implementation shall permit incremental expansion.
+PROJECT 1
+ ↓
+PROJECT 2
+ ↓
+PROJECT 3
+ ↓
+CITY
+ ↓
+REGION
+ ↓
+COUNTRY
+ ↓
+CONTINENT
+ ↓
+GLOBAL
+The infrastructure shall not require a complete planetary dataset before operation begins.
+
+66. EXISTING-WORLD RECONSTRUCTION
+Where authorized source information exists, OneDraft may progressively reconstruct representations of existing built environments.
+The process shall be:
+SOURCE DATA
+ ↓
+GEOGRAPHIC RECORD
+ ↓
+STRUCTURE PLACEHOLDER
+ ↓
+ADDITIONAL DATA
+ ↓
+GEOMETRIC MODEL
+ ↓
+ENGINEERING RECORD
+The resulting information shall preserve the distinction between observed source information and inferred or newly generated information.
+
+67. NEW-WORLD CONTRIBUTION
+New OneDraft projects may contribute appropriately authorized information.
+NEW PROJECT
+ ↓
+ENGINEERING MODEL
+ ↓
+VALIDATION
+ ↓
+ACCEPTANCE
+ ↓
+GEOGRAPHIC EXTRACTION
+ ↓
+GLOBAL REPOSITORY
+This creates a mechanism through which new engineering information can progressively enrich the geographic repository.
+
+68. OLD + NEW CONVERGENCE
+The implementation establishes the operational mechanism by which:
+PRE-EXISTING WORLD
+        +
+NEW ONEDRAFT ENGINEERING
+        ↓
+COMMON SPATIAL FRAMEWORK
+        ↓
+CONTINUOUS WORLD MODEL
+Existing information and newly generated information remain distinguishable while becoming spatially related.
+
+69. CITY IMPLEMENTATION
+The first practical expansion target may operate at city scale.
+CITY
+ ├── EXISTING STRUCTURES
+ ├── EXISTING INFRASTRUCTURE
+ ├── REGISTERED PROJECTS
+ ├── ONEDRAFT PROJECTS
+ └── EXTERNAL GIS DATA
+The same implementation can subsequently scale outward.
+
+70. GLOBAL IMPLEMENTATION
+At scale:
+CITY
+ ↓
+COUNTRY
+ ↓
+CONTINENT
+ ↓
+PLANET
+The repository becomes a distributed geographic information environment rather than a collection of isolated project databases.
+
+71. EARTH-DATA EXTENSIBILITY
+The ArcGIS implementation shall not be restricted to architectural structures.
+The spatial provider and canonical model shall remain extensible to:
+Land
+Water
+Infrastructure
+Transportation
+Ecology
+Environmental datasets
+Humanitarian geographic datasets
+Future Earth-data systems
+Architectural information shall remain the initial application domain.
+
+72. FUTURE DISPLACEMENT DATA INTERFACE
+The repository architecture shall be capable of accepting future aggregated geographic movement information.
+LOCATION A
+ ↓
+MOVEMENT EVENT
+ ↓
+LOCATION B
+ ↓
+TIME
+Future implementations shall apply appropriate privacy, aggregation and authorization controls.
+
+73. FUTURE ECOLOGICAL DATA INTERFACE
+Future ecological information may be spatially associated with built-environment data.
+STRUCTURES
++
+LAND
++
+WATER
++
+ECOLOGY
++
+TIME
+The ArcGIS integration shall therefore become an extensible spatial infrastructure layer rather than a building-only service.
+
+74. MAP APPLICATION IMPLEMENTATION
+The frontend shall consume OneDraft spatial APIs.
+FRONTEND
+ ↓
+MAP CONTROLLER
+ ↓
+SPATIAL API
+ ↓
+SPATIAL INDEX
+ ↓
+CANONICAL DATA
+The frontend shall not directly expose unrestricted external GIS credentials.
+
+75. MAP LAYER MODEL
+Map layers shall be composable.
+BASE MAP
++
+BOUNDARIES
++
+INFRASTRUCTURE
++
+STRUCTURES
++
+PROJECTS
++
+SITE
++
+ENGINEERING
+Layer visibility shall be governed by authorization and project context.
+
+76. PROJECT GIS WORKSPACE
+OneDraft shall provide a GIS-aware project workspace capable of displaying:
+Project location
+Site boundary
+Existing structures
+External GIS layers
+Project geometry
+Engineering context
+Spatial relationships
+The workspace shall connect geographic context with architectural design.
+
+77. CAD / GIS COORDINATION
+The implementation shall provide a controlled bridge:
+GIS
+ ↓
+SITE CONTEXT
+ ↓
+PROJECT COORDINATES
+ ↓
+CAD / BIM
+and:
+CAD / BIM
+ ↓
+PROJECT GEOMETRY
+ ↓
+GEOREFERENCE
+ ↓
+GIS
+The transformation chain shall remain traceable.
+
+78. SURVEY INTEGRATION
+Survey data may be incorporated through the same spatial pipeline.
+SURVEY
+ ↓
+IMPORT
+ ↓
+COORDINATE VALIDATION
+ ↓
+NORMALIZATION
+ ↓
+PROJECT SITE
+ ↓
+GLOBAL SPATIAL MODEL
+Survey information shall retain source metadata.
+
+79. EXISTING CAD / BIM INTEGRATION
+Existing CAD and BIM data may be geographically registered.
+EXISTING CAD/BIM
+ ↓
+IMPORT
+ ↓
+GEOREFERENCE
+ ↓
+VALIDATION
+ ↓
+SPATIAL MODEL
+ ↓
+PROJECT CONTEXT
+The implementation shall preserve original source identity.
+
+80. PDF / IMAGE GEOSPATIAL CONTEXT
+Where source documents contain geographic information, the existing OneDraft import architecture may provide spatial metadata to the geospatial subsystem.
+The system shall distinguish:
+Source document
+Extracted information
+Geospatial interpretation
+Validated spatial entity
+No unverified extraction shall automatically become authoritative spatial state.
+
+81. OBSERVABILITY
+The ArcGIS implementation shall emit telemetry for:
+Request count
+Request latency
+Provider errors
+Authentication failures
+Dataset imports
+Feature imports
+Synchronization
+Write-back
+Conflicts
+Retries
+Queue depth
+Worker utilization
+Spatial query performance
+
+82. AUDIT LOGGING
+Significant operations shall be auditable.
+Audit events shall include:
+Who
+What
+When
+Dataset
+Project
+Operation
+Result
+Source
+Destination
+Authorization context
+Audit records shall be protected from unauthorized modification.
+
+83. TESTING ARCHITECTURE
+Stack 53.0 shall require:
+Unit tests
+Adapter tests
+GIS contract tests
+Integration tests
+Spatial geometry tests
+CRS transformation tests
+Schema mapping tests
+Synchronization tests
+Conflict tests
+Security tests
+Tenant-isolation tests
+Performance tests
+End-to-end tests
+
+84. MOCK ARCGIS PROVIDER
+Development and automated testing shall support a mock GIS provider.
+OneDraft
+ ↓
+Provider Interface
+ ↓
+Mock ArcGIS Provider
+This permits testing without requiring live external GIS infrastructure for every development operation.
+
+85. INTEGRATION ENVIRONMENT
+A controlled integration environment shall support live ArcGIS testing.
+The environment shall separate:
+DEVELOPMENT
+STAGING
+PRODUCTION
+External credentials and datasets shall remain environment-specific.
+
+86. DEPLOYMENT ARCHITECTURE
+The ArcGIS integration shall deploy as part of the OneDraft application infrastructure.
+Conceptually:
+WEB
+ │
+API
+ │
+SPATIAL SERVICE
+ │
+QUEUE
+ │
+WORKER
+ │
+ARCGIS ADAPTER
+ │
+ARCGIS
+Supporting services shall remain integrated with PostgreSQL, object storage, observability and secrets management.
+
+87. CONFIGURATION
+ArcGIS configuration shall be environment-controlled.
+Configuration shall include:
+Service endpoints
+Provider settings
+Timeouts
+Retry policies
+Concurrency
+Dataset policies
+Synchronization schedules
+Feature flags
+Secrets shall remain outside source code.
+
+88. SECURITY MODEL
+The implementation shall preserve:
+Authentication
+Authorization
+Tenant isolation
+Secret management
+Auditability
+Data classification
+Provider access boundaries
+Project access boundaries
+The GIS connector shall be treated as an external integration boundary.
+
+89. FAILURE MODES
+The system shall explicitly handle:
+SERVICE UNAVAILABLE
+AUTHENTICATION FAILURE
+AUTHORIZATION FAILURE
+TIMEOUT
+RATE LIMIT
+INVALID RESPONSE
+INVALID GEOMETRY
+SCHEMA CONFLICT
+CRS FAILURE
+DATA CONFLICT
+DATABASE FAILURE
+QUEUE FAILURE
+Each condition shall produce a defined operational response.
+
+90. RECOVERY
+Recoverable operations shall support:
+Retry
+Resume
+Reconciliation
+Rollback where applicable
+Dead-letter processing
+Operator review
+The system shall preserve enough state to determine what occurred during an interrupted operation.
+
+91. DATA INTEGRITY
+The implementation shall preserve transactional integrity between:
+Spatial entity
+Dataset
+Layer
+Project
+Provenance
+Version
+Relationship
+Partial imports shall not create falsely complete canonical records.
+
+92. TRANSACTION BOUNDARIES
+Database transactions shall be defined around logically atomic operations.
+External ArcGIS calls shall not be assumed to participate in OneDraft database transactions.
+The implementation shall therefore use explicit synchronization state.
+
+93. IDEMPOTENCY
+Import and synchronization operations shall be idempotent where practical.
+Repeated execution of the same operation shall not create uncontrolled duplicate spatial entities.
+External identifiers and synchronization state shall support idempotent processing.
+
+94. REPOSITORY CONSISTENCY
+The system shall distinguish:
+SOURCE CONSISTENCY
+from:
+ONEDRAFT CONSISTENCY
+from:
+SYNCHRONIZATION CONSISTENCY
+The system shall expose synchronization state rather than implying that all systems are simultaneously identical.
+
+95. VERSION CONTROL
+Implementation artifacts shall be version controlled.
+This includes:
+Adapter code
+Schemas
+API contracts
+Dataset mappings
+Transformation rules
+Configuration
+Database migrations
+Synchronization logic
+Tests
+
+96. MIGRATION ARCHITECTURE
+Spatial database changes shall be introduced through controlled migrations.
+Migrations shall support:
+Forward migration
+Validation
+Rollback strategy where feasible
+Version tracking
+No manual production database modification shall be treated as the standard deployment mechanism.
+
+97. API CONTRACT
+The OneDraft OpenAPI architecture shall formally define all public and internal spatial endpoints.
+Contracts shall include:
+Request schemas
+Response schemas
+Authentication
+Authorization
+Errors
+Pagination
+Filtering
+Spatial parameters
+Versioning
+
+98. PAGINATION
+Large ArcGIS result sets shall use controlled pagination or batching.
+The implementation shall prevent unrestricted feature retrieval from exhausting application resources.
+Pagination state shall remain deterministic where the external provider supports appropriate ordering.
+
+99. BULK PROCESSING
+Large geographic datasets shall be processed through asynchronous bulk jobs.
+DATASET
+ ↓
+PARTITION
+ ↓
+QUEUE
+ ↓
+WORKERS
+ ↓
+VALIDATE
+ ↓
+PERSIST
+ ↓
+INDEX
+Workers shall be horizontally scalable.
+
+100. PERFORMANCE MODEL
+Performance targets shall be established for:
+Spatial query latency
+Dataset ingestion
+Feature processing
+Synchronization
+Map rendering
+Project context retrieval
+Global search
+Performance shall be measured rather than assumed.
+
+101. SCALABILITY MODEL
+The architecture shall scale independently across:
+API
+WORKERS
+QUEUES
+DATABASE
+SPATIAL INDEX
+OBJECT STORAGE
+MAP SERVICES
+The ArcGIS adapter shall not become a single system-wide bottleneck.
+
+102. GLOBAL REPOSITORY PARTITIONING
+As repository volume increases, spatial data may be partitioned by:
+Geography
+Tenant
+Dataset
+Temporal range
+Entity class
+The partitioning strategy shall remain transparent to the canonical API.
+
+103. GLOBAL INDEXING
+Global spatial indexing shall support geographic discovery without requiring full-table scans of the entire repository.
+Index design shall account for:
+Geometry
+Location
+Administrative hierarchy
+Entity type
+Temporal state
+Project
+Dataset
+
+104. REPOSITORY ARCHIVE
+Superseded spatial data may be moved into archival storage while preserving:
+Identity
+Provenance
+Version
+Temporal state
+Retrieval path
+Archiving shall not destroy required lineage.
+
+105. REPOSITORY BACKUP
+Spatial information shall participate in the existing OneDraft backup architecture.
+Backups shall include appropriate:
+Database records
+Spatial metadata
+Repository configuration
+Object artifacts
+Provenance
+Recovery shall be tested according to the existing disaster-recovery architecture.
+
+106. ARCGIS SERVICE HEALTH
+The integration shall periodically assess configured service health.
+Health state may be:
+AVAILABLE
+DEGRADED
+UNAVAILABLE
+AUTHENTICATION_ERROR
+CONFIGURATION_ERROR
+Service health shall be exposed through OneDraft observability.
+
+107. DATASET HEALTH
+Dataset health shall include:
+Last synchronization
+Record count
+Validation failures
+Schema changes
+Source availability
+Version
+Conflict count
+This permits administrators to identify deteriorating external integrations.
+
+108. SCHEMA DRIFT
+The system shall detect external schema changes.
+EXPECTED SCHEMA
+      +
+CURRENT ARCGIS SCHEMA
+      ↓
+SCHEMA COMPARISON
+      ↓
+COMPATIBLE
+OR
+DRIFT DETECTED
+Schema drift shall not silently break canonical mappings.
+
+109. VERSION DRIFT
+The synchronization system shall detect external version changes where provider information permits.
+Version differences shall become synchronization events.
+
+110. FEATURE DELETION
+External feature deletion shall be handled as a temporal state transition rather than automatic destruction of the OneDraft record.
+EXTERNAL FEATURE
+ ↓
+DELETED EXTERNALLY
+ ↓
+SYNC EVENT
+ ↓
+SUPERSEDED / REMOVED STATE
+Retention policy shall determine whether historical information remains available.
+
+111. SOURCE REPLACEMENT
+If an external dataset is replaced, OneDraft shall preserve the lineage between the old and new dataset where appropriate.
+DATASET A
+ ↓
+SUPERSEDED BY
+ ↓
+DATASET B
+
+112. MULTI-SOURCE RECONCILIATION
+Where multiple GIS sources represent the same geographic feature, the system shall preserve source distinctions.
+SOURCE A
+   \
+    → CANONICAL CONTEXT
+   /
+SOURCE B
+The system shall not automatically declare one source authoritative unless policy establishes that relationship.
+
+113. SPATIAL DATA CONFIDENCE
+The implementation shall maintain confidence metadata.
+Possible states include:
+VERIFIED
+SOURCE-CONFIRMED
+IMPORTED
+DERIVED
+ESTIMATED
+UNRESOLVED
+Confidence shall not be confused with legal or regulatory authority.
+
+114. HUMAN REVIEW
+Where automated reconciliation cannot safely resolve a conflict, the system shall create a review task.
+CONFLICT
+ ↓
+REVIEW QUEUE
+ ↓
+AUTHORIZED REVIEW
+ ↓
+DECISION
+ ↓
+RESOLUTION
+Human decisions shall be auditable.
+
+115. PROJECT ACCEPTANCE INTEGRATION
+Global repository contribution shall occur only according to the project's acceptance state and applicable authorization policy.
+DESIGN
+ ↓
+VALIDATION
+ ↓
+REVIEW
+ ↓
+ACCEPTANCE
+ ↓
+ELIGIBLE DATA
+ ↓
+GLOBAL CONTRIBUTION
+This protects the global repository from incomplete project states.
+
+116. ENGINEERING RECORD CONTRIBUTION
+Validated engineering information may be extracted into geographic context.
+Examples include:
+Building footprint
+Building height
+Levels
+Site boundary
+Structure classification
+Construction state
+Project date
+Spatial relationships
+The system shall preserve source provenance for each contribution.
+
+117. WORLD-MODEL UPDATE
+A repository contribution shall update the world model only through controlled state transition.
+PROJECT DATA
+ ↓
+VALIDATION
+ ↓
+CLASSIFICATION
+ ↓
+AUTHORIZED CONTRIBUTION
+ ↓
+WORLD MODEL
+The world model shall therefore evolve through explicit information events.
+
+118. FUTURE PROJECT CONTEXT
+Future OneDraft projects may query the repository to retrieve relevant existing information.
+NEW PROJECT
+ ↓
+SITE
+ ↓
+GLOBAL SEARCH
+ ↓
+EXISTING CONTEXT
+ ↓
+PROJECT MODEL
+This creates cumulative reuse of geographic engineering information.
+
+119. ENGINEERING KNOWLEDGE CONTINUITY
+The implementation establishes:
+PAST ENGINEERING
+       ↓
+GLOBAL REPOSITORY
+       ↓
+CURRENT ENGINEERING
+       ↓
+FUTURE ENGINEERING
+Information does not need to be recreated independently for every future project when authorized reusable information already exists.
+
+120. APPLICATION IMPLEMENTATION PHASES
+The implementation shall proceed through controlled phases.
+PHASE 1
+ARCGIS CONNECTIVITY
+        ↓
+PHASE 2
+DATASET / LAYER REGISTRY
+        ↓
+PHASE 3
+READ / QUERY SERVICES
+        ↓
+PHASE 4
+INGESTION / NORMALIZATION
+        ↓
+PHASE 5
+SPATIAL PERSISTENCE
+        ↓
+PHASE 6
+PROJECT GEOREFERENCING
+        ↓
+PHASE 7
+SYNCHRONIZATION
+        ↓
+PHASE 8
+AUTHORIZED WRITE-BACK
+        ↓
+PHASE 9
+GLOBAL REPOSITORY
+        ↓
+PHASE 10
+WORLD-MODEL APPLICATION
+
+121. MINIMUM VIABLE IMPLEMENTATION
+The first executable implementation shall establish:
+ArcGIS provider adapter
+Service registration
+Dataset registry
+Layer registry
+Feature retrieval
+Spatial normalization
+PostgreSQL spatial persistence
+Project georeferencing
+Spatial search
+Provenance
+Authentication
+Authorization
+Observability
+Testing
+This establishes a functioning OneDraft–ArcGIS integration without requiring the complete planetary repository on day one.
+
+122. EXPANDED IMPLEMENTATION
+Following the MVP integration, the system shall expand to:
+Bulk ingestion
+Synchronization
+Versioning
+Conflict resolution
+Global project index
+Structure registry
+Write-back
+Temporal world model
+Global mapping
+Large-scale spatial analysis
+
+123. IMPLEMENTATION READINESS
+Stack 53.0 shall be considered implementation-ready when the following are defined:
+DOMAIN MODEL
++
+DATABASE MODEL
++
+API CONTRACT
++
+ARCGIS ADAPTER
++
+AUTHENTICATION
++
+AUTHORIZATION
++
+DATA MAPPING
++
+INGESTION
++
+SYNCHRONIZATION
++
+WRITE-BACK
++
+PROVENANCE
++
+TESTING
++
+DEPLOYMENT
+The resulting specification shall be sufficient to begin implementation without requiring a new conceptual architecture.
+
+124. END-TO-END IMPLEMENTATION WORKFLOW
+The complete implementation workflow shall be:
+ARCGIS SERVICE
+ ↓
+DISCOVERY
+ ↓
+DATASET REGISTRATION
+ ↓
+LAYER REGISTRATION
+ ↓
+FEATURE QUERY
+ ↓
+INGESTION
+ ↓
+NORMALIZATION
+ ↓
+CRS TRANSFORMATION
+ ↓
+VALIDATION
+ ↓
+POSTGRESQL
+ ↓
+SPATIAL INDEX
+ ↓
+PROJECT CONTEXT
+ ↓
+ARIA
+ ↓
+ENGINEERING
+ ↓
+VALIDATION
+ ↓
+ACCEPTANCE
+ ↓
+AUTHORIZED WRITE-BACK
+ ↓
+GLOBAL REPOSITORY
+ ↓
+WORLD MODEL
+
+125. INTEGRATION WITH 1.0–52.0
+The OneDraft architecture now progresses:
+1.0–5.0
+FOUNDATION
+        ↓
+6.0–16.0
+EXECUTABLE APPLICATION FOUNDATION
+        ↓
+17.0–22.0
+CORE COMPUTATIONAL & DOCUMENTATION ENGINES
+        ↓
+23.0–29.0
+RUNTIME, JOBS, ARTIFACTS, EVENTS & SECURITY
+        ↓
+30.0–36.0
+OPERATIONS, QUALITY, INFRASTRUCTURE & DATA GOVERNANCE
+        ↓
+37.0–40.0
+AI, CAD STANDARDS & DATA EXCHANGE
+        ↓
+41.0–49.0
+USER PLATFORM, LIFECYCLE, COMMERCIAL & SCALE SYSTEMS
+        ↓
+50.0
+END-TO-END SYSTEM INTEGRATION
+        ↓
+51.0
+GLOBAL GEOSPATIAL INTELLIGENCE, MAPPING &
+EARTH DATA INTEGRATION
+        ↓
+52.0
+GLOBAL GEOSPATIAL APPLICATION, REPOSITORY &
+WORLD-MODEL IMPLEMENTATION
+        ↓
+53.0
+ONEDRAFT–ARCGIS REPOSITORY APPLICATION
+IMPLEMENTATION
+
+126. ARCHITECTURAL COMPLETION STATE
+Stack 53.0 establishes the executable bridge between OneDraft and the external ArcGIS ecosystem.
+The architecture now provides:
+ONEDRAFT
++
+ARIA
++
+CAD / BIM
++
+GEOMETRY
++
+PROJECT MODEL
++
+GLOBAL SPATIAL MODEL
++
+ARCGIS CONNECTIVITY
++
+GIS DATA INGESTION
++
+SPATIAL DATABASE
++
+SYNCHRONIZATION
++
+PROVENANCE
++
+VERSIONING
++
+AUTHORIZED WRITE-BACK
++
+GLOBAL REPOSITORY
+The OneDraft project can therefore operate as both:
+AN ENGINEERING PROJECT
+and:
+A GEOGRAPHICALLY REGISTERED NODE
+within the larger OneDraft spatial repository.
+
+127. MASTER IMPLEMENTATION MODEL
+The complete Stack 53.0 architecture is:
+                         ONEDRAFT
+                            │
+                           ARIA
+                            │
+                    PROJECT APPLICATION
+                            │
+                  GLOBAL SPATIAL MODEL
+                            │
+                 ONEDRAFT SPATIAL API
+                            │
+                    ARCGIS ADAPTER
+                            │
+             ┌──────────────┼──────────────┐
+             │              │              │
+         DISCOVERY       READ           WRITE
+             │              │              │
+             └──────────────┼──────────────┘
+                            │
+                     ARCGIS SERVICES
+                            │
+                    EXTERNAL GIS DATA
+                            │
+                    GLOBAL REPOSITORY
+                            │
+                    WORLD MODEL
+                            │
+                FUTURE EARTH DATA SYSTEMS
+
+128. FINAL IMPLEMENTATION PRINCIPLE
+Stack 53.0 establishes the principle:
+ARCGIS IS THE EXTERNAL GEOSPATIAL INTERFACE.
+
+ONEDRAFT IS THE ENGINEERING PLATFORM.
+
+THE ADAPTER IS THE CONTROLLED BRIDGE.
+
+THE SPATIAL MODEL IS THE CANONICAL ONEDRAFT REPRESENTATION.
+
+ARIA IS THE INTELLIGENT ORCHESTRATOR.
+
+VALIDATION IS THE DETERMINISTIC CONTROL.
+
+PROVENANCE PRESERVES SOURCE HISTORY.
+
+AUTHORIZATION CONTROLS REPOSITORY CONTRIBUTION.
+
+THE GLOBAL REPOSITORY PROVIDES CONTINUITY.
+
+THE WORLD MODEL PROVIDES TEMPORAL AND SPATIAL CONTEXT.
+The implementation therefore establishes the foundation through which OneDraft may progressively connect architectural projects, existing structures, GIS datasets and future geographic information into a persistent global engineering information environment.
+
+129. COMPLETION STATUS
+Stack: 53.0
+System: OneDraft CAD-AI
+Intelligence Layer: Aria
+Primary Function: OneDraft–ArcGIS Repository Application Implementation
+Primary External Integration: ArcGIS
+Primary Internal Integration: OneDraft Global Spatial Model
+Primary Persistence: OneDraft PostgreSQL Spatial Repository
+Primary Application Pattern: Provider Adapter + Canonical Spatial Model
+Primary Data Flow: ArcGIS → OneDraft
+Authorized Reverse Flow: OneDraft → ArcGIS
+Spatial Scope: Project → Site → Structure → City → Region → Country → Continent → Global
+Temporal Scope: Historical → Existing → Current → Proposed → Future
+Implementation Scope: Connectivity → Ingestion → Normalization → Persistence → Synchronization → Write-Back → Global Repository
+Architectural Status: IMPLEMENTATION SPECIFICATION
