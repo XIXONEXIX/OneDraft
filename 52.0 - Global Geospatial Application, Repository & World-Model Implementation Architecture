@@ -1,0 +1,1310 @@
+ONEDRAFT
+CAD-AI — Aria Powered
+Global Geospatial Application, Repository & World-Model Implementation Architecture
+Version 1.0
+Document: OneDraft Global Geospatial Application, Repository & World-Model Implementation Specification
+System: OneDraft CAD-AI
+Intelligence Layer: Aria
+Document Class: Architectural & Implementation Stack Specification
+Status: Architectural Specification
+Predecessor: Global Geospatial Intelligence, Mapping & Earth Data Integration Architecture
+Successor: OneDraft Global Spatial Data Processing & Distributed Repository Architecture
+
+1. PURPOSE
+Stack 52.0 defines the application architecture required to implement the Global Geospatial Intelligence, Mapping & Earth Data Integration Architecture established by Stack 51.0.
+Stack 51.0 establishes the geographic architecture.
+Stack 52.0 establishes how that architecture becomes an operational OneDraft application capability.
+The system shall therefore progress from:
+51.0
+GLOBAL GEOSPATIAL ARCHITECTURE
+        ↓
+52.0
+GLOBAL GEOSPATIAL APPLICATION
+        ↓
+SPATIAL REPOSITORY
+        ↓
+WORLD MODEL
+        ↓
+ONEDRAFT PROJECT INTEGRATION
+Stack 52.0 establishes the application-layer implementation through which geographic information becomes accessible to OneDraft projects, Aria, the project model, the CAD/BIM environment, the documentation system and future global Earth-data systems.
+
+2. SYSTEM OBJECTIVE
+The objective of Stack 52.0 is to transform the geographic architecture established in Stack 51.0 into a persistent application capability capable of:
+Registering geographic locations
+Registering existing structures
+Georeferencing OneDraft projects
+Connecting projects to geographic context
+Connecting existing-world information to projects
+Maintaining spatial relationships
+Maintaining temporal states
+Maintaining source provenance
+Synchronizing authorized GIS information
+Supporting geographic search
+Supporting spatial analysis
+Supporting Aria geospatial operations
+Maintaining a global project index
+Providing a foundation for future Earth-data applications
+The application shall be capable of expanding from individual project locations to a global spatial repository without requiring architectural replacement.
+
+3. APPLICATION ARCHITECTURE
+The Stack 52.0 application architecture shall integrate with the existing OneDraft platform as follows:
+                    ONEDRAFT
+                       │
+                 APPLICATION
+                       │
+          ┌────────────┼────────────┐
+          │            │            │
+       PROJECT       ARIA        FRONTEND
+          │            │            │
+          └────────────┼────────────┘
+                       │
+              GEOSPATIAL APPLICATION
+                       │
+        ┌──────────────┼──────────────┐
+        │              │              │
+   SPATIAL API    GIS ADAPTERS    MAP SERVICES
+        │              │              │
+        └──────────────┼──────────────┘
+                       │
+              GLOBAL SPATIAL MODEL
+                       │
+              SPATIAL REPOSITORY
+The geospatial application shall remain a bounded subsystem within the larger OneDraft architecture.
+
+4. GLOBAL SPATIAL APPLICATION LAYER
+The Global Spatial Application Layer shall provide the operational interface between the OneDraft project system and the geographic repository.
+Its responsibilities shall include:
+Spatial entity management
+Geographic search
+Spatial relationship management
+GIS synchronization
+Georeferencing
+Spatial validation
+Spatial metadata
+Spatial provenance
+Temporal spatial state
+Map generation
+Spatial analysis
+Spatial project discovery
+The application layer shall not directly bypass domain, authorization or persistence boundaries.
+
+5. SPATIAL DOMAIN SERVICES
+The application shall implement dedicated geospatial domain services.
+Core services shall include:
+SpatialEntityService
+ProjectGeoreferenceService
+SiteService
+StructureService
+SpatialRelationshipService
+SpatialDatasetService
+SpatialProvenanceService
+SpatialVersionService
+SpatialSearchService
+SpatialValidationService
+GISIntegrationService
+MapService
+SpatialAnalysisService
+These services shall integrate with the existing OneDraft domain-service architecture.
+
+6. PROJECT GEOREFERENCE SERVICE
+The Project Georeference Service shall establish the geographic identity of a OneDraft project.
+The service shall support:
+Project coordinates
+Site boundary
+Building footprint
+Coordinate reference system
+Survey reference
+Geographic identifiers
+Jurisdictional identifiers
+Elevation
+Orientation
+The georeference shall become part of the project domain state.
+
+7. SITE SERVICE
+The Site Service shall provide a canonical representation of the geographic project site.
+A site shall be capable of containing:
+SITE
+ ├── LOCATION
+ ├── BOUNDARY
+ ├── EXISTING STRUCTURES
+ ├── INFRASTRUCTURE
+ ├── TERRAIN
+ ├── EXTERNAL DATA
+ └── ONEDRAFT PROJECT
+The site shall become the principal geographic bridge between external spatial information and the architectural project.
+
+8. STRUCTURE SERVICE
+The Structure Service shall maintain spatially indexed representations of existing and OneDraft-managed structures.
+A structure record may contain:
+Structure ID
+Geographic location
+Footprint
+Height
+Levels
+Structure classification
+Source
+Temporal state
+Project relationship
+Provenance
+Confidence
+The structure record shall remain distinct from the complete architectural project model unless the two are explicitly linked.
+
+9. GLOBAL PROJECT REGISTRY
+The Global Project Registry shall provide the spatial index of OneDraft projects.
+Conceptually:
+GLOBAL
+ ↓
+CONTINENT
+ ↓
+COUNTRY
+ ↓
+REGION
+ ↓
+CITY
+ ↓
+SITE
+ ↓
+PROJECT
+Every project possessing sufficient geographic information may receive a global spatial registry record.
+The registry shall support authorized geographic discovery.
+
+10. GLOBAL STRUCTURE REGISTRY
+The Global Structure Registry shall provide a spatial index for known structures.
+The registry may contain:
+Existing structures
+Historical structures
+OneDraft projects
+Proposed structures
+Infrastructure structures
+Other authorized built-environment records
+The registry shall distinguish between source classifications.
+
+11. WORLD-MODEL APPLICATION
+The World-Model Application shall provide the persistent relationship between geographic entities and time.
+The model shall support:
+PAST
+ ↓
+HISTORICAL
+ ↓
+EXISTING
+ ↓
+CURRENT
+ ↓
+PROPOSED
+ ↓
+FUTURE
+A spatial object shall therefore be capable of possessing multiple temporal states without requiring the destruction of earlier states.
+
+12. SPATIAL ENTITY MODEL
+The canonical spatial entity shall provide a common base for geographic records.
+Conceptually:
+SpatialEntity
+ ├── id
+ ├── geometry
+ ├── spatial_reference
+ ├── source
+ ├── provenance
+ ├── temporal_state
+ ├── confidence
+ ├── classification
+ └── metadata
+Specialized entities shall inherit the common spatial architecture.
+
+13. GEOGRAPHIC HIERARCHY SERVICE
+The application shall maintain geographic hierarchy relationships.
+The hierarchy shall support:
+Planet
+Continent
+Country
+Administrative region
+Municipality
+City
+District
+Site
+Structure
+The implementation shall accommodate jurisdictional differences rather than assuming a universal administrative model.
+
+14. SPATIAL RELATIONSHIP ENGINE
+The Spatial Relationship Engine shall calculate and persist authorized relationships.
+Supported relationships shall include:
+Contains
+Contained By
+Intersects
+Overlaps
+Adjacent To
+Within
+Near
+Connected To
+Located At
+Derived From
+Modified From
+Replaces
+Relationships shall be validated before becoming persistent domain state.
+
+15. GIS CONNECTOR ARCHITECTURE
+The application shall provide a provider-neutral GIS connector architecture.
+                GIS SERVICE
+                    │
+          ┌─────────┼─────────┐
+          │         │         │
+       ArcGIS     Provider   Provider
+          │         │         │
+          └─────────┼─────────┘
+                    │
+             GIS ADAPTER
+                    │
+             ONEDRAFT MODEL
+ArcGIS shall be implemented as a primary connector within this architecture.
+Additional GIS systems may be integrated without changing the canonical OneDraft spatial model.
+
+16. ARCGIS APPLICATION CONNECTOR
+The ArcGIS Connector shall provide controlled interaction between OneDraft and authorized ArcGIS resources.
+The connector shall support applicable capabilities including:
+Layer discovery
+Feature retrieval
+Spatial queries
+Feature metadata
+Geographic attributes
+Spatial references
+Authorized synchronization
+The connector shall not automatically treat external ArcGIS data as authoritative OneDraft project data.
+
+17. GIS DATASET REGISTRY
+The application shall maintain a registry of external geographic datasets.
+A dataset record shall include:
+Dataset
+ ├── Provider
+ ├── Source
+ ├── Dataset ID
+ ├── Layer
+ ├── Spatial Reference
+ ├── Version
+ ├── Acquisition Date
+ ├── License
+ ├── Access Classification
+ └── Provenance
+The registry shall allow OneDraft to understand where geographic information originated.
+
+18. SPATIAL INGESTION SERVICE
+The Spatial Ingestion Service shall process external geographic information.
+The processing pipeline shall be:
+SOURCE
+ ↓
+DISCOVERY
+ ↓
+RETRIEVAL
+ ↓
+SCHEMA INSPECTION
+ ↓
+SPATIAL REFERENCE IDENTIFICATION
+ ↓
+VALIDATION
+ ↓
+NORMALIZATION
+ ↓
+PROVENANCE
+ ↓
+CANONICAL MODEL
+ ↓
+INDEXING
+Failed ingestion shall produce explicit errors and shall not silently modify canonical state.
+
+19. SPATIAL NORMALIZATION SERVICE
+The normalization service shall convert external geographic information into the OneDraft canonical spatial representation.
+Normalization shall address:
+Coordinate systems
+Units
+Geometry types
+Attribute schemas
+Identifiers
+Temporal representations
+Classification systems
+The original source representation shall remain recoverable where required.
+
+20. COORDINATE TRANSFORMATION SERVICE
+The Coordinate Transformation Service shall perform controlled spatial-reference transformations.
+Every transformation shall preserve:
+Source CRS
+Target CRS
+Transformation method
+Units
+Precision
+Transformation metadata
+The transformed geometry shall remain traceable to the original representation.
+
+21. SPATIAL VALIDATION SERVICE
+The Spatial Validation Service shall verify incoming and generated spatial information.
+Validation shall include:
+Geometry validity
+Coordinate validity
+Spatial reference
+Topology
+Required attributes
+Boundary consistency
+Precision
+Schema compatibility
+The validation result shall be recorded.
+
+22. SPATIAL VERSION SERVICE
+The Spatial Version Service shall maintain geographic versions.
+A spatial entity may therefore progress:
+VERSION 1
+ ↓
+VERSION 2
+ ↓
+VERSION 3
+ ↓
+CURRENT
+Historical states shall remain identifiable according to retention policy.
+
+23. WORLD-STATE SERVICE
+The World-State Service shall provide temporal state management.
+It shall distinguish:
+Historical
+Existing
+Current
+Proposed
+Future
+The service shall permit comparison between states.
+
+24. CHANGE REGISTRY
+The Change Registry shall record authorized spatial changes.
+Examples include:
+Construction
+Alteration
+Expansion
+Demolition
+Replacement
+Boundary Change
+Infrastructure Change
+Project Proposal
+Changes shall be associated with time, source and provenance.
+
+25. GLOBAL DATA PLACEHOLDER SYSTEM
+One of the primary functions of Stack 52.0 shall be the creation of persistent geographic placeholders.
+A geographic record may exist before complete information is available.
+For example:
+LOCATION
+ ↓
+PLACEHOLDER RECORD
+ ↓
+STRUCTURE IDENTIFIED
+ ↓
+ADDITIONAL DATA
+ ↓
+ONEDRAFT PROJECT
+ ↓
+ENGINEERING INFORMATION
+ ↓
+DOCUMENTATION
+The placeholder system permits the repository to grow incrementally.
+
+26. EXISTING-WORLD IMPORT
+Existing-world information may be incorporated into the repository where authorized and available.
+Potential sources include:
+GIS
+CAD
+BIM
+Survey
+Public geographic information
+Licensed datasets
+Client data
+Historical records
+Each source shall retain provenance.
+
+27. ONEDRAFT PROJECT CONTRIBUTION
+A completed or appropriately validated OneDraft project may contribute authorized spatial information back into the global repository.
+The contribution workflow shall be:
+PROJECT
+ ↓
+VALIDATION
+ ↓
+ACCEPTED PROJECT STATE
+ ↓
+GEOGRAPHIC EXTRACTION
+ ↓
+PROVENANCE
+ ↓
+GLOBAL REGISTRY
+The system shall not automatically publish private project information.
+Publication shall be governed by authorization and data policy.
+
+28. OLD + NEW DATA CONVERGENCE
+The application shall support convergence between pre-existing information and newly generated OneDraft information.
+HISTORICAL DATA
+       ↓
+GLOBAL SPATIAL MODEL
+       ↑
+NEW ONEDRAFT PROJECT
+Both may become temporally related records within the same geographic environment.
+
+29. ARCHITECTURAL CONTEXT SERVICE
+The Architectural Context Service shall allow OneDraft to retrieve relevant geographic information for a project.
+A project request may produce:
+PROJECT
+ ↓
+SITE
+ ↓
+GEOGRAPHIC CONTEXT
+ ├── EXISTING STRUCTURES
+ ├── BOUNDARIES
+ ├── INFRASTRUCTURE
+ ├── TERRAIN
+ └── AUTHORIZED EXTERNAL DATA
+This context may then be supplied to project workflows.
+
+30. ARIA GEOSPATIAL SERVICE
+Aria shall interact with the Global Geospatial Application through controlled service interfaces.
+The flow shall be:
+USER
+ ↓
+ARIA
+ ↓
+GEOSPATIAL INTENT
+ ↓
+STRUCTURED COMMAND
+ ↓
+AUTHORIZATION
+ ↓
+SPATIAL SERVICE
+ ↓
+DETERMINISTIC RESULT
+ ↓
+ARIA
+ ↓
+USER
+Aria shall not directly modify canonical spatial records without the appropriate service and authorization path.
+
+31. SPATIAL QUERY SERVICE
+The Spatial Query Service shall support:
+Radius searches
+Bounding-box searches
+Polygon searches
+Intersection queries
+Containment queries
+Nearest-feature queries
+Geographic hierarchy queries
+Project-location queries
+Temporal queries
+Results shall remain subject to authorization.
+
+32. GLOBAL MAP APPLICATION
+The frontend shall provide a geographic visualization layer.
+The conceptual navigation shall be:
+PLANET
+ ↓
+CONTINENT
+ ↓
+COUNTRY
+ ↓
+CITY
+ ↓
+SITE
+ ↓
+STRUCTURE
+ ↓
+PROJECT
+ ↓
+DOCUMENTATION
+Map visualization shall be a representation of underlying spatial data and shall not become the authoritative source of project geometry.
+
+33. PROJECT MAP CONTEXT
+Every georeferenced OneDraft project shall be capable of displaying its geographic context.
+The project map may include:
+Site
+Building
+Adjacent structures
+Roads
+Boundaries
+Infrastructure
+Terrain
+Authorized external layers
+The map shall remain synchronized with the project spatial state.
+
+34. CAD / GIS APPLICATION BRIDGE
+The application shall provide controlled translation between architectural geometry and geographic geometry.
+CAD / BIM
+    ↓
+PROJECT COORDINATE SYSTEM
+    ↓
+GEOREFERENCE
+    ↓
+GIS REPRESENTATION
+and:
+GIS
+    ↓
+SITE CONTEXT
+    ↓
+PROJECT COORDINATE SYSTEM
+    ↓
+CAD / BIM CONTEXT
+Transformations shall preserve source and precision metadata.
+
+35. GLOBAL STRUCTURE PLACEHOLDERS
+Where an existing structure is identified geographically but detailed architectural information is unavailable, the application may maintain a structure placeholder.
+For example:
+STRUCTURE ID
+LOCATION
+FOOTPRINT
+SOURCE
+DATE
+STATUS
+Later information may populate:
+BUILDING MODEL
+LEVELS
+USE
+MATERIALS
+DOCUMENTATION
+ALTERATIONS
+ENGINEERING DATA
+The placeholder architecture is therefore a direct mechanism for progressive repository development.
+
+36. TEMPORAL PROJECT INTEGRATION
+A OneDraft project shall be capable of being associated with multiple world states.
+EXISTING SITE
+      ↓
+PROJECT DESIGN
+      ↓
+APPROVED DESIGN
+      ↓
+CONSTRUCTION
+      ↓
+COMPLETED STRUCTURE
+      ↓
+FUTURE ALTERATION
+The geographic record shall remain connected throughout the lifecycle.
+
+37. GLOBAL PROJECT GRAPH
+The application shall support a geographic project graph.
+Conceptually:
+CITY
+ ├── SITE
+ │    ├── EXISTING STRUCTURE
+ │    ├── ONEDRAFT PROJECT
+ │    └── INFRASTRUCTURE
+ │
+ ├── SITE
+ │    └── PROJECT
+ │
+ └── SITE
+      └── STRUCTURE
+This graph shall permit spatial and relational discovery.
+
+38. SPATIAL KNOWLEDGE GRAPH FOUNDATION
+The geographic application shall establish the foundation for a future spatial knowledge graph.
+Relationships may connect:
+PLACE
+ ↕
+STRUCTURE
+ ↕
+PROJECT
+ ↕
+DOCUMENT
+ ↕
+EVENT
+ ↕
+TIME
+ ↕
+SOURCE
+This creates machine-readable relationships across geographic and engineering information.
+
+39. GLOBAL REPOSITORY WRITE-BACK
+Where authorized, OneDraft shall write validated project-derived information back into the global repository.
+Write-back shall occur only after:
+PROJECT VALIDATION
+ ↓
+DATA CLASSIFICATION
+ ↓
+AUTHORIZATION
+ ↓
+PROVENANCE
+ ↓
+REPOSITORY UPDATE
+This prevents incomplete or unauthorized project information from becoming global repository state.
+
+40. GLOBAL REPOSITORY READ-BACK
+Existing global information may be read into a project context through:
+GLOBAL REPOSITORY
+ ↓
+SPATIAL QUERY
+ ↓
+DATA VALIDATION
+ ↓
+PROJECT CONTEXT
+ ↓
+ONEDRAFT
+Read-back data shall remain distinguishable from project-generated information.
+
+41. BIDIRECTIONAL INFORMATION LOOP
+The complete application architecture establishes:
+                  GLOBAL REPOSITORY
+                    ↑         ↓
+                    │         │
+             WRITE-BACK     READ-BACK
+                    │         │
+                    │         │
+                 ONEDRAFT PROJECT
+                    ↑         ↓
+                    │         │
+              NEW ENGINEERING
+                    ↑
+              NEW INFORMATION
+This creates the foundation for a continuously expanding geographic engineering repository.
+
+42. DATA PROVENANCE APPLICATION
+Every significant spatial record shall retain provenance through the application layer.
+The application shall preserve:
+Origin
+Source
+Transformation
+Version
+Timestamp
+Processing
+Project
+Operator or system process
+Provenance shall remain available to authorized users and system services.
+
+43. DATA QUALITY APPLICATION
+The application shall maintain quality metadata.
+Quality dimensions may include:
+Accuracy
+Precision
+Completeness
+Currency
+Resolution
+Confidence
+Verification State
+Quality information shall remain distinct from the underlying geographic record.
+
+44. SPATIAL CONFIDENCE
+Spatial information may be classified as:
+VERIFIED
+SOURCE-CONFIRMED
+IMPORTED
+DERIVED
+ESTIMATED
+UNRESOLVED
+SUPERSEDED
+The classification shall communicate the state of the information without converting uncertainty into false precision.
+
+45. GLOBAL SEARCH APPLICATION
+The application shall provide geographic discovery across authorized records.
+Users may search by:
+Location
+Project
+Structure
+City
+Country
+Dataset
+Time
+Project status
+Structure type
+Spatial relationship
+Search results shall respect tenant and data-access boundaries.
+
+46. SPATIAL ANALYSIS SERVICE
+The application shall expose deterministic spatial operations including:
+Distance
+Area
+Intersection
+Containment
+Proximity
+Buffering
+Spatial aggregation
+Coordinate transformation
+The resulting values shall be computational outputs rather than AI-generated estimates.
+
+47. ARIA ANALYTICAL ORCHESTRATION
+Aria may orchestrate spatial analysis.
+For example:
+USER:
+"Show the relevant existing structures around this site."
+
+ARIA
+ ↓
+INTERPRET REQUEST
+ ↓
+SPATIAL QUERY
+ ↓
+DETERMINISTIC FILTER
+ ↓
+RESULT
+ ↓
+CONTEXTUAL RESPONSE
+The system shall preserve the distinction between computation and interpretation.
+
+48. FUTURE EARTH-DATA APPLICATION INTERFACE
+Stack 52.0 shall establish application interfaces capable of supporting future datasets beyond architecture.
+Potential future domains include:
+Ecology
+Land
+Water
+Climate
+Infrastructure
+Transportation
+Human settlement
+Humanitarian mapping
+Population movement
+Environmental monitoring
+These systems shall integrate through the Global Spatial Application rather than directly modifying architectural project services.
+
+49. MASS-DISPLACEMENT APPLICATION FOUNDATION
+The spatial application shall be capable of supporting future aggregate movement datasets.
+The conceptual model shall be:
+ORIGIN
+ ↓
+MOVEMENT EVENT
+ ↓
+GEOGRAPHIC PATH
+ ↓
+TEMPORARY LOCATION
+ ↓
+DESTINATION
+Where such systems are later implemented, privacy, aggregation and data-governance controls shall apply.
+
+50. EARTH-ECOLOGY APPLICATION FOUNDATION
+The application shall provide a geographic interface through which future ecological information may be spatially associated with built-environment information.
+BUILT ENVIRONMENT
+       +
+LAND
+       +
+WATER
+       +
+ECOLOGY
+       +
+TIME
+       ↓
+SPATIAL EARTH MODEL
+The implementation shall remain modular.
+
+51. GLOBAL WORLD-MODEL APPLICATION
+The World-Model Application shall provide the central relationship:
+WHERE
++
+WHAT
++
+WHEN
++
+SOURCE
++
+CHANGE
+for geographically represented information.
+This creates the foundation for a continuously evolving spatial world model.
+
+52. REPOSITORY MATURATION
+The repository shall mature progressively.
+The intended progression is:
+PLACEHOLDER
+ ↓
+LOCATION
+ ↓
+STRUCTURE
+ ↓
+CONTEXT
+ ↓
+PROJECT
+ ↓
+ENGINEERING
+ ↓
+DOCUMENTATION
+ ↓
+VERIFIED CHANGE
+ ↓
+HISTORICAL RECORD
+A geographic record therefore does not need to be complete at creation.
+It becomes progressively richer.
+
+53. CITY-TO-CITY EXPANSION
+The application shall support expansion from individual projects to city-scale datasets.
+PROJECT
+ ↓
+CITY INDEX
+ ↓
+MULTIPLE PROJECTS
+ ↓
+STRUCTURE REGISTRY
+ ↓
+CITY BUILT-ENVIRONMENT MODEL
+The same architecture shall then extend to regions and countries.
+
+54. COUNTRY-TO-COUNTRY EXPANSION
+The repository shall support geographic expansion:
+CITY
+ ↓
+REGION
+ ↓
+COUNTRY
+ ↓
+COUNTRY
+ ↓
+COUNTRY
+The application architecture shall remain jurisdiction-neutral while permitting jurisdiction-specific geographic and regulatory configuration.
+
+55. CONTINENTAL EXPANSION
+The system shall support:
+COUNTRY
+ ↓
+CONTINENT
+ ↓
+MULTI-CONTINENT
+ ↓
+GLOBAL
+Spatial indexing and infrastructure shall scale independently of the project-domain architecture.
+
+56. PLANETARY APPLICATION MODEL
+The long-term application model shall become:
+                       PLANET
+                          │
+              GLOBAL SPATIAL INDEX
+                          │
+          ┌───────────────┼───────────────┐
+          │               │               │
+      CONTINENTS       OCEANS          EARTH DATA
+          │                               │
+      COUNTRIES                       ECOLOGY
+          │                            CLIMATE
+       CITIES                           WATER
+          │                             LAND
+        SITES
+          │
+      STRUCTURES
+          │
+      PROJECTS
+The planetary model shall be understood as an architectural target enabled by progressive repository growth.
+
+57. API INTEGRATION
+Stack 52.0 shall integrate with the existing OneDraft API architecture.
+Spatial APIs shall support:
+/projects/{id}/location
+/sites/{id}
+/structures/{id}
+/spatial/entities
+/spatial/datasets
+/spatial/search
+/spatial/relationships
+/spatial/versions
+/spatial/events
+Final API contracts shall be governed through the existing OpenAPI architecture.
+
+58. EVENT INTEGRATION
+Spatial events shall enter the OneDraft Event Bus.
+Events may include:
+ProjectGeoreferenced
+SiteCreated
+StructureRegistered
+SpatialDatasetImported
+SpatialDatasetUpdated
+SpatialRelationshipCreated
+SpatialStateChanged
+GISSynchronizationCompleted
+SpatialValidationCompleted
+GlobalRepositoryUpdated
+Events shall be versioned and traceable.
+
+59. JOB INTEGRATION
+Large geospatial operations shall execute through the existing Job & Worker system.
+Jobs may include:
+GIS imports
+Spatial transformations
+Large-area searches
+Spatial indexing
+Map rendering
+Dataset synchronization
+Spatial analysis
+Repository reconciliation
+The application shall not execute long-running operations synchronously within ordinary request paths.
+
+60. ARTIFACT INTEGRATION
+Generated geographic outputs shall use the existing Artifact Management Engine.
+Artifacts may include:
+Maps
+Spatial reports
+GeoJSON
+CAD exports
+GIS packages
+Spatial datasets
+Rendered geographic context
+Artifacts shall receive hashes, provenance and lifecycle metadata.
+
+61. SECURITY INTEGRATION
+All spatial operations shall pass through the existing OneDraft security architecture.
+The application shall enforce:
+Authentication
+Authorization
+Tenant isolation
+Project permissions
+Dataset permissions
+Administrative privileges
+Audit logging
+No global geographic index shall bypass private-project access controls.
+
+62. MULTI-TENANT SPATIAL MODEL
+Spatial information shall be classified according to visibility:
+GLOBAL / PUBLIC
+      │
+LICENSED
+      │
+ORGANIZATION
+      │
+PROJECT
+      │
+RESTRICTED
+The same geographic location may therefore contain information belonging to different access domains.
+The application shall enforce those boundaries independently of geographic proximity.
+
+63. ADMINISTRATIVE CONTROL
+Stack 49.0 shall control application-level geographic configuration.
+Administrative controls may include:
+GIS providers
+Dataset sources
+Spatial policies
+Coordinate systems
+Import rules
+Data classifications
+Repository write-back rules
+Geospatial feature availability
+Administrative changes shall be versioned and audited.
+
+64. OBSERVABILITY
+Stack 52.0 shall integrate with OneDraft telemetry.
+Metrics shall include:
+Spatial query latency
+GIS connector availability
+Dataset ingestion rate
+Transformation failures
+Spatial validation failures
+Repository writes
+Repository reads
+Spatial job duration
+Map rendering performance
+The system shall provide operational visibility into the global geospatial application.
+
+65. TESTING
+The geospatial application shall require:
+Unit testing
+Integration testing
+GIS connector testing
+Spatial geometry testing
+Coordinate transformation testing
+API contract testing
+Security testing
+Tenant-isolation testing
+Temporal-state testing
+Provenance testing
+Performance testing
+End-to-end project georeferencing
+
+66. FAILURE HANDLING
+The application shall explicitly handle:
+GIS unavailable
+Dataset unavailable
+Invalid geometry
+Invalid coordinates
+Unsupported CRS
+Transformation failure
+Schema mismatch
+Authorization failure
+Duplicate record
+Conflicting source
+Repository failure
+Failure shall produce recoverable state wherever practical.
+
+67. SYNCHRONIZATION MODEL
+Synchronization shall support controlled states:
+DISCOVERED
+ ↓
+REGISTERED
+ ↓
+SYNCHRONIZING
+ ↓
+VALIDATING
+ ↓
+SYNCHRONIZED
+ ↓
+SUPERSEDED
+The system shall not assume that external sources remain static.
+
+68. CONFLICT MODEL
+When external GIS information differs from existing OneDraft information, the application shall create a conflict state where appropriate.
+SOURCE A
+   \
+    → CONFLICT → RESOLUTION
+   /
+SOURCE B
+Resolution shall be governed by configured rules and, where necessary, human review.
+
+69. DATA LINEAGE
+The application shall maintain lineage:
+EXTERNAL SOURCE
+ ↓
+DATASET
+ ↓
+FEATURE
+ ↓
+TRANSFORMATION
+ ↓
+ONEDRAFT ENTITY
+ ↓
+PROJECT
+ ↓
+ARTIFACT
+This permits downstream information to remain traceable.
+
+70. APPLICATION LIFECYCLE
+The Stack 52.0 application lifecycle shall be:
+REGISTER
+ ↓
+LOCATE
+ ↓
+INGEST
+ ↓
+NORMALIZE
+ ↓
+VALIDATE
+ ↓
+INDEX
+ ↓
+CONNECT
+ ↓
+ANALYZE
+ ↓
+UPDATE
+ ↓
+VERSION
+ ↓
+REUSE
+This lifecycle shall operate continuously as the repository expands.
+
+71. ENGINEERING INFORMATION CONTINUITY
+The application establishes continuity between previous and future engineering work.
+PREVIOUS PROJECT
+      ↓
+GLOBAL REPOSITORY
+      ↓
+CURRENT PROJECT
+      ↓
+NEW ENGINEERING
+      ↓
+GLOBAL REPOSITORY
+      ↓
+FUTURE PROJECT
+This is the operational implementation of the architectural principle established in Stack 51.0.
+
+72. PROJECT-TO-REPOSITORY FEEDBACK
+A completed project can become a source of contextual information for future projects.
+The controlled loop is:
+PROJECT
+ ↓
+VALIDATED INFORMATION
+ ↓
+AUTHORIZED CONTRIBUTION
+ ↓
+GLOBAL REPOSITORY
+ ↓
+FUTURE PROJECT
+This creates cumulative information growth.
+
+73. REPOSITORY-TO-PROJECT FEEDBACK
+The reverse process is:
+GLOBAL REPOSITORY
+ ↓
+AUTHORIZED DATA
+ ↓
+PROJECT CONTEXT
+ ↓
+ARIA
+ ↓
+DESIGN / ENGINEERING
+The two directions establish a persistent information cycle.
+
+74. CONTINUOUS ENGINEERING MODEL
+The complete Stack 52.0 implementation produces:
+OBSERVE
+ ↓
+REGISTER
+ ↓
+MAP
+ ↓
+MODEL
+ ↓
+ENGINEER
+ ↓
+VALIDATE
+ ↓
+DOCUMENT
+ ↓
+BUILD / MODIFY
+ ↓
+RECORD
+ ↓
+UPDATE
+ ↓
+OBSERVE AGAIN
+Engineering information therefore becomes cumulative rather than strictly project-isolated.
+
+75. ARCHITECTURAL INVARIANTS
+Stack 52.0 shall preserve the following invariants:
+Geographic Identity: Every georeferenced project has a persistent spatial identity.
+Provenance: External information remains attributable to its source.
+Temporal Integrity: Historical states remain distinguishable.
+Authority: External GIS information does not automatically override OneDraft project state.
+Determinism: Spatial calculations use deterministic services.
+AI Separation: Aria interprets and orchestrates but does not replace authoritative spatial computation.
+Security: Geographic location does not override access control.
+Scalability: The application can grow from project scale to planetary scale.
+Interoperability: GIS, CAD, BIM and OneDraft remain connected through defined interfaces.
+Extensibility: Future Earth-data systems can attach without restructuring the core architecture.
+
+76. END-TO-END APPLICATION WORKFLOW
+The complete Stack 52.0 workflow is:
+USER
+ ↓
+ONEDRAFT PROJECT
+ ↓
+SITE IDENTIFICATION
+ ↓
+GEOREFERENCE
+ ↓
+GLOBAL SPATIAL QUERY
+ ↓
+ARCGIS / GIS DATA
+ ↓
+INGESTION
+ ↓
+NORMALIZATION
+ ↓
+VALIDATION
+ ↓
+GLOBAL SPATIAL CONTEXT
+ ↓
+PROJECT MODEL
+ ↓
+ARIA
+ ↓
+ENGINEERING / DESIGN
+ ↓
+VALIDATION
+ ↓
+DOCUMENTATION
+ ↓
+ACCEPTANCE
+ ↓
+AUTHORIZED REPOSITORY WRITE-BACK
+ ↓
+GLOBAL WORLD MODEL
+This workflow establishes the operational connection between the OneDraft project and the geographic world.
+
+77. SYSTEM INTEGRATION WITH 1.0–51.0
+The architecture now becomes:
+1.0–5.0
+FOUNDATION
+        ↓
+6.0–16.0
+EXECUTABLE APPLICATION FOUNDATION
+        ↓
+17.0–22.0
+CORE COMPUTATIONAL & DOCUMENTATION ENGINES
+        ↓
+23.0–29.0
+RUNTIME, JOBS, ARTIFACTS, EVENTS & SECURITY
+        ↓
+30.0–36.0
+OPERATIONS, QUALITY, INFRASTRUCTURE & DATA GOVERNANCE
+        ↓
+37.0–40.0
+AI, CAD STANDARDS & DATA EXCHANGE
+        ↓
+41.0–49.0
+USER PLATFORM, LIFECYCLE, COMMERCIAL & SCALE SYSTEMS
+        ↓
+50.0
+END-TO-END SYSTEM INTEGRATION
+        ↓
+51.0
+GLOBAL GEOSPATIAL INTELLIGENCE & MAPPING ARCHITECTURE
+        ↓
+52.0
+GLOBAL GEOSPATIAL APPLICATION & WORLD-MODEL IMPLEMENTATION
+
+78. ARCHITECTURAL COMPLETION STATE
+With Stack 52.0, OneDraft now contains the architecture necessary to connect individual architectural projects to a persistent global spatial information environment.
+The resulting system is:
+PROJECT
+ +
+GEOMETRY
+ +
+COMPLIANCE
+ +
+VALIDATION
+ +
+DOCUMENTATION
+ +
+ARIA
+ +
+GIS
+ +
+GLOBAL SPATIAL REPOSITORY
+ +
+TEMPORAL WORLD MODEL
+ +
+EXISTING STRUCTURES
+ +
+FUTURE STATES
+ ↓
+ONEDRAFT GLOBAL ENGINEERING PLATFORM
+
+79. MASTER APPLICATION MODEL
+The complete Stack 52.0 application can be represented as:
+                         ONEDRAFT
+                            │
+                          ARIA
+                            │
+                    APPLICATION LAYER
+                            │
+       ┌────────────────────┼────────────────────┐
+       │                    │                    │
+    PROJECT              SPATIAL             GIS
+    SYSTEM               SYSTEM             SYSTEM
+       │                    │                    │
+       └────────────────────┼────────────────────┘
+                            │
+                  GLOBAL SPATIAL MODEL
+                            │
+                  GLOBAL REPOSITORY
+                            │
+             ┌──────────────┼──────────────┐
+             │              │              │
+         HISTORICAL       CURRENT        FUTURE
+             │              │              │
+             └──────────────┼──────────────┘
+                            │
+                    WORLD INFORMATION
+                            │
+                 FUTURE EARTH SYSTEMS
+
+80. FINAL SYSTEM PRINCIPLE
+Stack 52.0 establishes the operational principle:
+THE WORLD PROVIDES THE CONTEXT.
+GIS PROVIDES THE GEOGRAPHIC FRAMEWORK.
+ONEDRAFT PROVIDES THE ENGINEERING MODEL.
+ARIA PROVIDES THE INTELLIGENT INTERFACE.
+VALIDATION PROVIDES DETERMINISTIC CONTROL.
+THE REPOSITORY PROVIDES CONTINUITY.
+TIME PROVIDES HISTORY.
+NEW PROJECTS PROVIDE NEW INFORMATION.
+The result is an architecture in which every authorized OneDraft project can become part of a larger, geographically indexed and temporally aware engineering information environment.
+
+81. COMPLETION STATUS
+Stack: 52.0
+System: OneDraft CAD-AI
+Intelligence Layer: Aria
+Primary Function: Global Geospatial Application, Repository & World-Model Implementation
+Primary Integration: GIS / ArcGIS
+Primary Repository: OneDraft Global Spatial Repository
+Primary Model: Global Spatial + Temporal World Model
+Application Scope: Project → Site → Structure → City → Region → Country → Continent → Global
+Temporal Scope: Historical → Existing → Current → Proposed → Future
+Integration Scope: CAD + BIM + GIS + AI + Architectural Engineering + Global Spatial Data
+Architectural Status: DEFINED
+System Register: 1.0–52.0
+The OneDraft architecture now progresses from the original architectural project system into a geographically persistent engineering information system capable of progressively connecting existing structures, new projects and future information through a common spatial and temporal framework.
