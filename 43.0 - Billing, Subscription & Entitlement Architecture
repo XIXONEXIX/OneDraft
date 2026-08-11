@@ -1,0 +1,503 @@
+ONEDRAFT
+CAD-AI — Aria Powered
+Billing, Subscription & Entitlement Architecture
+Version 1.0
+Document: OneDraft Billing, Subscription & Entitlement Architecture Specification
+System: OneDraft CAD-AI
+Intelligence Layer: Aria
+Document Class: Architectural & Implementation Stack Specification
+Status: Architectural Specification
+Predecessor: Project Lifecycle & State Machine Architecture Specification
+Successor: Multi-Tenant Organization & Project Isolation Architecture Specification
+
+1. PURPOSE
+The Billing, Subscription & Entitlement Architecture establishes the commercial-control system governing OneDraft plans, subscriptions, usage, quotas, metering, entitlements and organization-level commercial boundaries.
+The purpose of this subsystem is to provide a deterministic relationship between commercial configuration and the capabilities available to an organization and its projects.
+Billing shall remain separate from core project data, computational correctness, regulatory validation and architectural authority.
+A commercial condition shall never alter the authoritative Project Model or invalidate previously generated project records.
+The billing architecture shall therefore provide a controlled commercial layer over the OneDraft application while preserving project integrity, data ownership, security and lifecycle continuity.
+2. ARCHITECTURAL ROLE
+The Billing, Subscription & Entitlement subsystem forms the commercial authorization layer of OneDraft.
+It determines which platform capabilities, usage quantities and service resources an organization is entitled to consume according to its active commercial configuration.
+Primary responsibility: Manage subscriptions, plans, usage, quotas, metering and feature entitlements.
+Primary inputs: Organization identity, subscription configuration, plan definitions, usage events, billing events, administrative configuration and entitlement requests.
+Primary outputs: Entitlement decisions, quota states, usage records, billing records, subscription states and commercial events.
+Authority: Commercial configuration and subscription state shall be authoritative for entitlement decisions.
+Separation: Billing state shall not become authoritative for Project Model, compliance, validation or document correctness.
+3. COMMERCIAL ARCHITECTURE
+OneDraft shall separate commercial configuration into distinct concepts.
+Plan: Defines a commercial product offering.
+Subscription: Represents an organization's active commercial relationship with a plan.
+Entitlement: Defines a capability or resource available under a subscription.
+Quota: Defines a permitted quantity or usage limit.
+Meter: Measures consumption.
+Usage Record: Records measured consumption.
+Billing Period: Defines the period over which usage and subscription activity are evaluated.
+Invoice: Represents a billing record generated through the applicable billing system.
+Credit: Represents an authorized commercial adjustment.
+4. PLAN ARCHITECTURE
+A Plan shall define a controlled collection of OneDraft capabilities and commercial limits.
+A plan may specify:
+Features
+Project Limits
+Storage Limits
+Modeling Capacity
+Drawing Generation Capacity
+AI Usage
+Export Capabilities
+API Capacity
+User Limits
+Organization Limits
+Support Level
+Billing Interval
+Plans shall be versioned so that historical subscriptions remain associated with the plan configuration applicable at the relevant time.
+5. PLAN VERSIONING
+Plan definitions shall be immutable once used by an active subscription except through controlled versioning.
+A new plan configuration shall create a new plan version rather than silently modifying historical commercial conditions.
+Historical billing and entitlement decisions shall remain reproducible using the plan version that was active when the decision occurred.
+6. SUBSCRIPTION
+A Subscription shall represent an organization's commercial enrollment in a OneDraft plan.
+A subscription shall contain:
+Subscription Identifier
+Organization Identifier
+Plan Identifier
+Plan Version
+Status
+Start Date
+Renewal Date
+Billing Interval
+Current Period
+Cancellation State
+Entitlement State
+External Billing Reference, where applicable.
+7. SUBSCRIPTION STATES
+The canonical subscription states shall include:
+PENDING
+TRIAL
+ACTIVE
+PAST_DUE
+SUSPENDED
+CANCELLED
+EXPIRED
+Subscription state shall be distinct from project lifecycle state.
+A project's lifecycle state shall not automatically change merely because a subscription changes state.
+8. TRIAL STATE
+TRIAL shall permit controlled access to specified OneDraft capabilities for a defined period or usage allowance.
+Trial configuration shall specify:
+Duration
+Included Features
+Usage Limits
+Project Limits
+Storage Limits
+Conversion Conditions
+Trial usage shall be metered according to the same authoritative usage architecture used for paid subscriptions where practical.
+9. ACTIVE STATE
+ACTIVE indicates that the subscription is currently entitled to the capabilities defined by its plan and applicable commercial configuration.
+An active subscription shall permit entitlement evaluation according to its plan, organization and applicable usage conditions.
+10. PAST_DUE STATE
+PAST_DUE indicates that a billing condition requires attention while the subscription remains subject to the applicable grace and entitlement rules.
+The system shall distinguish between billing delinquency and immediate loss of access.
+Grace periods and restricted-access policies shall be configurable.
+11. SUSPENDED STATE
+SUSPENDED indicates that subscription capabilities have been restricted according to defined commercial policy.
+Suspension shall not delete project information.
+Existing project artifacts and historical records shall remain subject to their applicable retention and access policies.
+12. CANCELLED STATE
+CANCELLED indicates that the subscription has been terminated.
+Cancellation shall preserve commercial history and shall not inherently delete organization or project data.
+The organization may retain access to data according to the applicable plan, contractual configuration and administrative policies.
+13. EXPIRED STATE
+EXPIRED indicates that a subscription has reached the end of its permitted commercial period without renewal or continuation.
+Expiration shall produce a deterministic entitlement state.
+The platform shall distinguish expired subscription status from deleted organization or project data.
+14. ENTITLEMENT MODEL
+An Entitlement defines whether a specific organization or user may consume a particular OneDraft capability.
+Representative entitlements include:
+Project Creation
+Project Modeling
+Geometry Computation
+Compliance Analysis
+Validation
+Drawing Generation
+CAD Export
+BIM Export
+AI Interaction
+API Access
+Artifact Storage
+Advanced Review
+Administrative Controls
+Entitlements shall be evaluated using authoritative subscription and organization information.
+15. ENTITLEMENT TYPES
+Entitlements may be:
+Boolean: Capability is enabled or disabled.
+Quantity-Based: Capability is limited to a defined quantity.
+Rate-Based: Capability is limited within a defined time interval.
+Resource-Based: Capability depends upon available computational or storage resources.
+Role-Based: Capability depends upon organizational role.
+Project-Based: Capability applies to specified project types or quantities.
+16. ENTITLEMENT EVALUATION
+An entitlement request shall be evaluated against:
+Organization
+Subscription
+Plan
+Plan Version
+Feature
+Usage
+Quota
+Project
+User
+Authorization
+Administrative Configuration
+The resulting decision shall identify whether the operation is permitted.
+17. ENTITLEMENT DECISION
+An entitlement decision shall contain sufficient information to explain the result.
+Decision: Allowed or denied.
+Entitlement: Capability evaluated.
+Subject: Organization, user or project.
+Reason: Deterministic reason for the decision.
+Quota State: Applicable remaining or consumed quantity.
+Plan: Relevant commercial configuration.
+Timestamp: Time of evaluation.
+Entitlement decisions may be logged for operational and audit purposes.
+18. QUOTA ARCHITECTURE
+Quotas shall establish controlled limits for resource consumption.
+Representative quotas include:
+Projects Per Organization
+Users Per Organization
+Storage
+AI Requests
+AI Compute
+Drawing Generation
+Geometry Computation
+Exports
+API Requests
+Background Jobs
+Quotas shall be configurable by plan and organization.
+19. QUOTA PERIODS
+Quota measurements may operate over:
+Billing Period
+Calendar Period
+Daily Period
+Monthly Period
+Project Lifetime
+Organization Lifetime
+The applicable period shall be explicitly defined by the quota configuration.
+20. USAGE METERING
+OneDraft shall maintain an authoritative usage-metering architecture.
+Usage shall be generated from measurable system events.
+Potential usage dimensions include:
+AI Tokens
+AI Requests
+Geometry Compute Time
+Drawing Generation Jobs
+Export Operations
+Storage Consumption
+API Requests
+Worker Runtime
+Project Count
+Usage records shall identify the organization and applicable project where appropriate.
+21. USAGE EVENTS
+Usage shall be captured through structured events.
+A usage event shall include:
+Usage Event Identifier
+Organization Identifier
+Project Identifier, where applicable.
+Meter Type
+Quantity
+Unit
+Source Event
+Timestamp
+Actor
+Correlation Identifier
+Usage events shall be immutable after authoritative recording.
+22. USAGE AGGREGATION
+Usage events shall be aggregated into authoritative usage totals.
+Aggregation shall support:
+Current Period Usage
+Historical Usage
+Project Usage
+Organization Usage
+Meter Usage
+Quota Consumption
+Aggregation shall be deterministic and reproducible.
+23. IDEMPOTENCY
+Usage recording shall support idempotency.
+The same underlying operational event shall not create duplicate billable usage merely because a worker, event consumer or API request was retried.
+Usage events shall therefore possess unique identifiers or equivalent idempotency keys.
+24. BILLING PERIOD
+Each subscription shall have a defined billing period.
+The billing period shall determine:
+Usage Window
+Quota Reset
+Recurring Charges
+Billing Events
+Subscription Renewal
+The system shall preserve historical billing-period records.
+25. INVOICING
+Where OneDraft provides or integrates with invoicing functionality, invoices shall represent commercial records associated with the organization and subscription.
+An invoice may include:
+Subscription Charges
+Usage Charges
+Credits
+Adjustments
+Taxes
+Billing Period
+Invoice Status
+External payment-provider identifiers shall be stored as references rather than becoming authoritative project records.
+26. PAYMENT PROVIDER INTEGRATION
+OneDraft may integrate with external payment and billing providers.
+External providers shall handle payment processing where applicable.
+OneDraft shall maintain the minimum required commercial state needed to evaluate subscriptions and entitlements.
+Payment credentials shall not be stored within the OneDraft application unless explicitly required and appropriately secured.
+27. BILLING WEBHOOKS
+External billing events shall be processed through controlled webhook or integration endpoints.
+Incoming billing events shall be:
+Authenticated
+Validated
+Idempotently Processed
+Recorded
+Mapped to Organization
+Mapped to Subscription
+Converted into Internal Commercial Events
+External billing events shall not directly mutate arbitrary project records.
+28. COMMERCIAL EVENT BUS
+Commercial events shall integrate with the OneDraft event architecture.
+Representative events include:
+SubscriptionCreated
+SubscriptionActivated
+SubscriptionRenewed
+SubscriptionPastDue
+SubscriptionSuspended
+SubscriptionCancelled
+SubscriptionExpired
+UsageRecorded
+QuotaExceeded
+EntitlementChanged
+Commercial events shall be versioned and traceable.
+29. FEATURE ENTITLEMENTS
+Platform features shall be represented through controlled feature identifiers.
+Example identifiers may include:
+feature.project.create
+feature.modeling
+feature.compliance
+feature.validation
+feature.drawing.generate
+feature.cad.export
+feature.bim.export
+feature.aria
+feature.api
+feature.advanced.review
+Feature identifiers shall remain stable while their commercial availability is controlled through versioned configuration.
+30. ARIA ENTITLEMENTS
+Aria access shall be governed by explicit commercial entitlements where the selected OneDraft plan requires it.
+Entitlement controls may govern:
+Aria Availability
+Request Volume
+Model Access
+Advanced Reasoning Features
+Context Capacity
+Generation Capacity
+Automation Features
+API-Based Aria Access
+Commercial limits shall not alter the correctness requirements imposed by the AI architecture.
+31. AI USAGE METERING
+AI usage shall be metered independently from AI decision quality.
+Usage metrics may include:
+Requests
+Input Tokens
+Output Tokens
+Model Runtime
+Compute Units
+Tool Operations
+Generated Artifacts
+The billing architecture shall consume authoritative usage events from the AI runtime rather than attempting to reconstruct usage from frontend activity.
+32. COMPUTATIONAL USAGE
+Geometry and computational operations may be metered where commercial plans require capacity controls.
+Potential metrics include:
+CPU Time
+Worker Runtime
+Geometry Operations
+Model Regeneration
+Rendering Operations
+Large-Model Processing
+Computational usage shall be measured by the execution architecture.
+33. STORAGE ENTITLEMENTS
+Artifact and object storage consumption may be subject to organizational quotas.
+Storage calculations shall distinguish between:
+Active Artifacts
+Historical Artifacts
+Imported Artifacts
+Generated Artifacts
+Temporary Processing Artifacts
+Retention and deletion rules shall remain governed by the Data Lifecycle architecture.
+34. API ENTITLEMENTS
+API usage may be governed through plan-specific limits.
+Controls may include:
+Requests Per Minute
+Requests Per Hour
+Requests Per Billing Period
+Concurrent Requests
+API Feature Access
+API entitlement evaluation shall integrate with the API Gateway and Rate Limiting architecture.
+35. ORGANIZATION ADMINISTRATION
+Organization administrators shall have access to appropriate commercial controls.
+Administrative functions may include:
+Plan Inspection
+Subscription Inspection
+Usage Monitoring
+Entitlement Inspection
+User Allocation
+Project Allocation
+Billing Configuration
+Payment Configuration
+Administrative access shall be controlled through the Identity, Access and Authorization architecture.
+36. USAGE DASHBOARD
+The frontend shall provide an organization-level usage interface.
+The dashboard may display:
+Current Plan
+Subscription State
+Billing Period
+Usage
+Remaining Quotas
+Enabled Features
+Usage Trends
+Subscription Events
+The displayed information shall originate from authoritative commercial services.
+37. QUOTA ENFORCEMENT
+Quota enforcement shall occur before the protected operation is accepted.
+Where a quota is exceeded, the application shall return a deterministic entitlement or quota result.
+The frontend shall communicate the condition without exposing internal implementation details.
+Quota enforcement shall not rely solely upon frontend counters.
+38. SOFT AND HARD LIMITS
+Commercial limits may be defined as:
+Soft Limit: Usage threshold that generates a warning while permitting continued operation.
+Hard Limit: Usage threshold that prevents additional consumption.
+The applicable limit behavior shall be defined by plan configuration.
+39. OVERAGE
+Plans may support controlled overage policies.
+Where overage is enabled, the system shall record consumption beyond the included quota and associate the excess usage with the applicable billing configuration.
+Where overage is disabled, the applicable operation shall be denied once the hard limit is reached.
+40. CREDITS AND ADJUSTMENTS
+Authorized commercial credits and adjustments shall be represented as explicit records.
+Each adjustment shall identify:
+Adjustment Identifier
+Organization
+Subscription
+Amount or Quantity
+Reason
+Authorized Actor
+Timestamp
+Source
+Credits shall not modify historical usage events.
+41. COMMERCIAL AUDIT
+Commercial operations shall be auditable.
+The system shall retain records of:
+Subscription Changes
+Plan Changes
+Entitlement Changes
+Usage
+Quota Changes
+Credits
+Billing Events
+Administrative Actions
+Historical commercial state shall remain reconstructable.
+42. PLAN CHANGES
+An organization may change plans through an authorized commercial operation.
+Plan changes shall create explicit subscription records and effective dates.
+The system shall define whether the change is:
+Immediate
+End-of-Period
+Scheduled
+The entitlement service shall evaluate the appropriate plan according to the effective timestamp.
+43. DOWNGRADE PROTECTION
+A plan downgrade shall not silently destroy project information.
+Where a downgrade causes the organization to exceed newly applicable quotas, the system shall establish a controlled restricted state.
+Existing project data shall remain subject to applicable access and retention policies.
+The system shall clearly identify conditions that must be resolved.
+44. UPGRADE
+An upgrade shall create the applicable entitlement state according to the effective subscription configuration.
+New capabilities shall become available only after the authoritative subscription state confirms the upgrade.
+Frontend presentation shall follow the authoritative entitlement state.
+45. CANCELLATION PROTECTION
+Subscription cancellation shall preserve historical billing and project records.
+The system shall clearly distinguish:
+Subscription Cancellation
+from
+Organization Deletion
+and
+Project Deletion
+These are separate operations governed by separate architectures.
+46. DATA MODEL
+The billing architecture shall support structured commercial entities.
+Representative entities include:
+Plan
+PlanVersion
+Subscription
+SubscriptionPeriod
+Entitlement
+Quota
+Meter
+UsageEvent
+UsageAggregate
+Invoice
+BillingEvent
+Credit
+CommercialAdjustment
+EntitlementDecision
+BillingConfiguration
+These structures shall integrate with Organization, User, Project and API usage structures without becoming replacements for those domain entities.
+47. API ARCHITECTURE
+The billing API shall expose controlled commercial resources.
+Representative endpoints include:
+GET /organizations/{id}/billing
+GET /organizations/{id}/subscription
+GET /organizations/{id}/entitlements
+GET /organizations/{id}/usage
+GET /organizations/{id}/quotas
+GET /organizations/{id}/billing/history
+POST /organizations/{id}/subscription
+POST /organizations/{id}/subscription/change
+POST /organizations/{id}/subscription/cancel
+POST /billing/webhooks
+The final API contract shall remain governed by the established OneDraft OpenAPI architecture.
+48. SECURITY, TESTING & OPERATIONAL INTEGRITY
+Billing and entitlement services shall be protected by the OneDraft identity and authorization architecture.
+Testing shall include:
+Plan Evaluation
+Subscription Transitions
+Entitlement Decisions
+Quota Enforcement
+Usage Metering
+Idempotency
+Billing Webhooks
+Plan Changes
+Cancellation
+Upgrade
+Downgrade
+Concurrent Usage
+Failure Recovery
+Security
+Commercial decisions shall be deterministic and observable.
+The billing system shall not become a privileged pathway for bypassing project authorization, lifecycle controls or security boundaries.
+49. ARCHITECTURAL INVARIANTS
+The following invariants shall govern the Billing, Subscription & Entitlement Architecture.
+Commercial Separation: Billing state shall remain separate from authoritative project state.
+Deterministic Entitlements: Identical commercial state and entitlement inputs shall produce the same entitlement result.
+Backend Enforcement: Commercial limits shall not depend solely upon frontend controls.
+Historical Integrity: Historical subscription and usage records shall remain preserved.
+Idempotent Metering: A single operational event shall not be counted more than once.
+No Project Destruction: Commercial state changes shall not silently destroy project information.
+Explicit Plan Changes: Upgrades and downgrades shall produce explicit commercial records.
+Controlled Access: Entitlement decisions shall remain subject to identity and authorization.
+AI Separation: AI usage metering shall not determine AI correctness or validation.
+Tenant Association: Commercial records shall remain associated with the correct organization.
+Auditability: Commercial state changes shall remain traceable.
+Provider Independence: External payment providers shall not become authoritative sources for OneDraft project state.
+50. COMPLETION STATUS
+The Billing, Subscription & Entitlement Architecture establishes the complete commercial-control layer for OneDraft.
+The subsystem defines plans, plan versions, subscriptions, subscription states, entitlements, quotas, usage metering, AI usage, computational usage, storage limits, API limits, billing periods, invoicing, external payment integration, commercial events, upgrades, downgrades, cancellation, credits, overage and commercial auditing.
+The architecture establishes a controlled relationship between the OneDraft commercial model and the capabilities available to organizations while preserving the independence and integrity of project data, Project Model state, lifecycle state, validation, documentation and security.
+The next architectural layer establishes the formal Multi-Tenant Organization & Project Isolation architecture, defining how organizations, users, projects, resources, quotas and data remain isolated within the OneDraft platform.
+Status: ARCHITECTURALLY DEFINED
+Next Document: Multi-Tenant Organization & Project Isolation Architecture Specification
+Overall Architecture: OneDraft End-to-End System Integration
