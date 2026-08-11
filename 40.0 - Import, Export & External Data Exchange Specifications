@@ -1,0 +1,379 @@
+ONEDRAFT
+CAD-AI — Aria Powered
+Import, Export & External Data Exchange Specifications
+Version 1.0
+Document: OneDraft Import, Export & External Data Exchange Specification
+System: OneDraft CAD-AI
+Intelligence Layer: Aria
+Document Class: Architectural & Implementation Stack Specification
+Status: Architectural Specification
+Predecessor: Standards, Architectural Graphics & CAD Interoperability Specification
+Successor: Frontend & User Interaction Architecture
+
+1. PURPOSE
+The Import, Export & External Data Exchange subsystem establishes the controlled architecture through which OneDraft receives, interprets, transforms, validates, generates and exchanges external project information.
+The purpose of this subsystem is to provide a deterministic boundary between the authoritative OneDraft Project Model and information originating from external systems, files, professional consultants, existing project documentation, survey sources, CAD/BIM applications, specifications, images, PDFs and other supported project-data sources.
+External project information shall not be treated as inherently authoritative merely because it originates from an external file or professional software system.
+OneDraft shall instead provide controlled ingestion, normalization, classification, validation, transformation, provenance and exchange mechanisms through which external information can become usable within the OneDraft project environment.
+The subsystem shall also provide controlled export mechanisms for producing external project artifacts while preserving the interoperability, standards, provenance and integrity requirements established throughout the OneDraft architecture.
+2. ARCHITECTURAL ROLE
+The Import, Export & External Data Exchange subsystem forms the principal external-data boundary of OneDraft.
+It connects external information sources to the Project Model, documentation system, CAD/BIM interoperability layer, artifact system, validation architecture and Aria intelligence layer.
+Primary responsibility: Control the ingestion and exchange of external project information without compromising the integrity of the authoritative OneDraft Project Model.
+Primary inputs: CAD files, BIM models, IFC files, DXF/DWG files, PDFs, images, survey information, specifications, schedules, spreadsheets, structured data, external project metadata and other supported project information.
+Primary outputs: Normalized project data, imported model elements, validated external information, generated exchange artifacts, export packages, transformation manifests and provenance records.
+Authority: Imported information shall enter the OneDraft system as external information until it has been validated and incorporated into the appropriate authoritative Project Model structures.
+Determinism: Equivalent source information processed under equivalent import configuration shall produce equivalent normalized results, subject to explicitly versioned translators and interpretation systems.
+3. EXTERNAL DATA ARCHITECTURE
+OneDraft shall maintain a formal external-data architecture separating source information from normalized project information.
+External data shall pass through controlled stages before becoming available to downstream computational systems.
+The principal stages shall include source acquisition, artifact registration, file identification, format detection, parsing, extraction, normalization, classification, validation, mapping, provenance registration and controlled incorporation.
+The architecture shall preserve the original source artifact.
+Imported information shall remain traceable to its originating artifact and transformation process.
+4. IMPORT AND EXPORT BOUNDARY
+The import/export boundary shall provide a controlled interface between OneDraft and external systems.
+The boundary shall distinguish between:
+Source Artifact: Original externally supplied file or information package.
+Imported Representation: Structured information extracted from the source artifact.
+Normalized Representation: OneDraft-compatible representation produced through controlled transformation.
+Project Representation: Information incorporated into the Project Model or associated project-domain structures.
+Export Representation: External representation generated from OneDraft project information.
+Exchange Artifact: Resulting external file or package.
+This separation shall prevent external file formats from becoming implicit replacements for OneDraft's internal architecture.
+5. SUPPORTED EXTERNAL DATA
+OneDraft shall provide an extensible external-data framework capable of supporting multiple project-information classes.
+Supported information may include:
+CAD: DXF, DWG and other supported CAD representations.
+BIM: IFC and supported BIM exchange representations.
+Documents: PDF and other supported document formats.
+Images: Raster and vector image formats used for project information.
+Survey Data: Coordinate information, point data, surfaces, alignments and related survey information.
+Specifications: Structured and unstructured technical specifications.
+Schedules: Tabular project information, equipment schedules, room schedules and related data.
+Spreadsheets: Structured tabular project information.
+Structured Data: JSON, CSV, XML and other supported structured representations.
+Project Metadata: External project identifiers, source information, dates, revisions and related metadata.
+The supported format registry shall remain extensible.
+6. SOURCE ARTIFACT REGISTRATION
+Every imported external artifact shall first be registered within the OneDraft artifact architecture.
+Registration shall establish the artifact identity, source, format, size, integrity information and ingestion context before interpretation occurs.
+Artifact Identifier: Stable OneDraft identifier assigned to the source artifact.
+Source: Originating system, user, organization or external process where available.
+File Name: Original source filename.
+Media Type: Detected or declared content type.
+File Size: Size of the source artifact.
+Hash: Integrity hash calculated from the source artifact.
+Received Time: Time at which the artifact entered the OneDraft system.
+Import Status: Current state of the ingestion process.
+The original source artifact shall remain preserved according to the data lifecycle and retention architecture.
+7. FORMAT DETECTION
+OneDraft shall determine the format of an external artifact through controlled detection.
+Format detection shall not rely solely upon filename extensions.
+Where practical, the system shall inspect file signatures, declared media types and structural characteristics.
+The detected format shall determine the applicable parser and validation pathway.
+Unsupported formats shall be identified explicitly rather than being interpreted through an incompatible parser.
+8. IMPORT PROFILES
+Import operations shall use controlled import profiles.
+An import profile shall define the expected source format, parsing behavior, coordinate configuration, unit interpretation, classification rules and normalization requirements.
+Import profiles shall be versioned.
+Project-specific import profiles shall be permitted where authorized.
+A profile shall not silently modify global system behavior.
+9. CAD IMPORT
+CAD imports shall support controlled ingestion of supported drawing information.
+The import system shall be capable of interpreting supported geometry, layers, blocks, dimensions, annotations, coordinate information and other supported CAD structures.
+Imported CAD information shall retain its source-layer and source-object references where technically possible.
+CAD geometry shall not automatically become authoritative architectural geometry merely because it was successfully imported.
+10. BIM IMPORT
+BIM imports shall support controlled ingestion of supported building-information representations.
+IFC and other supported BIM exchange formats shall be processed through dedicated interoperability translators.
+The import system shall identify supported objects, relationships, properties, spatial structures and external identifiers.
+Where external BIM objects can be mapped reliably into OneDraft domain objects, the mapping shall be recorded.
+Where information cannot be faithfully represented, the limitation shall be captured as an import result.
+11. SURVEY DATA IMPORT
+Survey information shall be supported as a controlled external data class.
+The system shall support appropriate survey representations including coordinate points, elevations, surfaces, alignments and related spatial information where supported by the selected import profile.
+Survey data shall preserve coordinate reference information.
+Coordinate transformations shall be explicit.
+Imported survey information shall retain source provenance and shall not silently redefine the project coordinate system.
+12. PDF IMPORT
+PDF files may contain vector drawings, raster imagery, text, dimensions, annotations, specifications and other project information.
+OneDraft shall treat PDF ingestion as an extraction process rather than assuming that every PDF contains directly usable structured CAD information.
+The import engine shall distinguish between extractable vector information, text, raster content and unstructured document content.
+Extracted information shall retain references to its source document and page where possible.
+13. IMAGE IMPORT
+Images may represent site photographs, scanned drawings, diagrams, maps, sketches, reference documents and other project information.
+Image imports shall retain source metadata and image integrity information.
+Where image interpretation is performed, extracted information shall remain distinguishable from authoritative model information.
+Aria-assisted image interpretation shall produce structured observations or proposals rather than silently mutating the Project Model.
+14. DOCUMENT AND SPECIFICATION IMPORT
+Technical specifications and other project documents shall be ingestible through controlled document-processing workflows.
+The system may extract text, tables, headings, references, identifiers and other structured information from supported documents.
+Extracted information shall retain document provenance.
+Where extracted information is proposed for incorporation into the Project Model, the proposal shall pass through appropriate validation and command controls.
+15. TABULAR DATA IMPORT
+OneDraft shall support controlled ingestion of tabular project data.
+Tabular sources may include schedules, room lists, equipment lists, door schedules, finish schedules, cost-related project tables and other structured information.
+Columns shall be mapped through explicit import mappings.
+Data-type conversion shall be deterministic.
+Invalid or ambiguous mappings shall be identified rather than silently accepted.
+16. DATA NORMALIZATION
+Imported information shall be normalized into representations compatible with the OneDraft domain architecture.
+Normalization may include unit conversion, coordinate transformation, identifier normalization, classification mapping, geometry conversion, property normalization and relationship reconstruction.
+Normalization shall preserve the original source values where required for provenance and auditability.
+The normalized representation shall remain linked to the source information.
+17. CLASSIFICATION AND MAPPING
+External objects shall be mapped to OneDraft domain classifications through controlled mapping rules.
+Examples may include mapping an external wall object to a OneDraft wall element, an external level to a OneDraft Level, an external space to a OneDraft Space or an external grid to a OneDraft Grid.
+Mappings shall be versioned.
+Ambiguous classifications shall be identified for review.
+Aria may assist in classification proposals, but deterministic validation shall govern incorporation into authoritative domain structures.
+18. IDENTITY MAPPING
+External identifiers shall be preserved whenever possible.
+The system shall maintain relationships between external object identifiers and OneDraft identifiers.
+External Identifier: Identifier assigned by the originating system.
+Internal Identifier: OneDraft identifier assigned to the normalized or incorporated object.
+Source Artifact: Artifact from which the object originated.
+Mapping State: Current state of the identity relationship.
+Identity mapping shall support subsequent synchronization, comparison and export operations.
+19. COORDINATE SYSTEMS
+Coordinate systems shall be explicitly represented throughout import and export operations.
+The system shall identify the source coordinate system where available.
+Coordinate transformations shall be defined as explicit operations.
+Source Coordinate System: Coordinate system used by the external source.
+Project Coordinate System: Coordinate system used by the OneDraft project.
+Transformation: Deterministic operation converting source coordinates to project coordinates.
+Transformation Parameters: Values required to reproduce the transformation.
+No external import shall silently redefine the authoritative project coordinate system.
+20. UNITS AND MEASUREMENT SYSTEMS
+External units shall be detected or explicitly declared.
+The import system shall convert source units into the project measurement system through deterministic conversion rules.
+Original units shall remain available as source metadata.
+Conversions shall preserve sufficient precision for the intended project use.
+Unit conflicts shall be surfaced as validation conditions.
+21. EXTERNAL DATA VALIDATION
+Imported information shall undergo validation before incorporation into authoritative project structures.
+Validation shall evaluate format integrity, structural integrity, coordinate consistency, unit consistency, required fields, object relationships, supported classifications and other applicable requirements.
+Validation results shall be recorded.
+An import operation may therefore complete successfully as an artifact ingestion while remaining incomplete as a project-model incorporation.
+22. IMPORT STAGING
+Imported data shall pass through a staging environment before authoritative incorporation where appropriate.
+Staging permits inspection, validation, mapping and review without immediately changing the Project Model.
+The staging system shall maintain relationships between source artifacts and proposed project objects.
+Approved staged information may then be incorporated through controlled project-model commands.
+Rejected or superseded staged information shall remain auditable according to retention policy.
+23. PROJECT MODEL INCORPORATION
+External information shall enter the authoritative Project Model only through defined domain operations.
+Import processors shall not directly bypass the Project Model service layer.
+Incorporation shall respect existing constraints, relationships, identity and versioning requirements.
+Where imported information conflicts with existing authoritative information, the conflict shall be represented explicitly.
+The system shall not silently overwrite authoritative project data.
+24. CONFLICT DETECTION
+The external-data subsystem shall detect conflicts between imported information and existing project information.
+Conflicts may include:
+Geometry Conflict: Imported geometry conflicts with authoritative geometry.
+Identity Conflict: External and internal identifiers cannot be reconciled.
+Coordinate Conflict: Source coordinates conflict with project coordinates.
+Unit Conflict: Source and project measurement systems are incompatible or ambiguous.
+Semantic Conflict: Source object classification conflicts with the existing Project Model.
+Version Conflict: Imported information represents an earlier or incompatible project state.
+Conflicts shall become structured validation or review records.
+25. CHANGE DETECTION
+Where external information is re-imported, OneDraft shall support comparison against previously imported versions.
+The system shall identify additions, deletions, modifications and unchanged information where technically possible.
+Change detection shall use stable identifiers where available and controlled geometric or semantic comparison where necessary.
+Detected changes shall not automatically become authoritative model changes.
+26. EXTERNAL DATA PROVENANCE
+Every imported object or normalized information record shall maintain provenance where practical.
+Provenance shall identify the source artifact, source object, import profile, translator version and transformation context.
+This enables OneDraft to determine where project information originated and how it entered the system.
+Provenance shall remain associated with the information through subsequent transformations wherever technically possible.
+27. EXPORT ARCHITECTURE
+OneDraft shall provide controlled export mechanisms for project information.
+Exports shall be generated from defined Project Model versions, drawing versions, documentation states or other authoritative project representations.
+Export operations shall use explicit export profiles.
+The resulting artifact shall be registered within the OneDraft artifact system.
+28. EXPORT PROFILES
+Export profiles shall define the target format, standards configuration, unit system, coordinate behavior, object mappings and supported output content.
+Export profiles shall be versioned.
+Project-specific export profiles shall be supported where authorized.
+Export configuration shall be recorded in the resulting interoperability manifest.
+29. CAD EXPORT
+CAD export shall operate through the CAD interoperability architecture.
+Supported project information shall be converted into the target CAD representation while preserving layer structures, geometry, annotations, dimensions and other supported drawing information.
+Export shall maintain the coordinate and unit requirements established by the project.
+Unsupported information shall be identified through the export validation system.
+30. BIM EXPORT
+BIM export shall generate supported external BIM representations from the authoritative Project Model.
+The export system shall preserve supported semantic objects, properties, relationships, spatial structures and identifiers.
+Where the target format cannot represent a OneDraft concept directly, the translation shall apply a documented mapping rule and record the resulting limitation where applicable.
+31. DOCUMENT EXPORT
+OneDraft shall support export of generated documentation into supported document formats.
+Exports may include drawing sheets, project packages, schedules, reports and other controlled documentation artifacts.
+Document exports shall retain revision, provenance and generation metadata where the target format permits.
+32. IMAGE AND RASTER EXPORT
+The system shall support controlled rasterization of project views and drawing artifacts where required.
+Raster exports shall preserve the configured drawing scale and output resolution.
+The resulting artifact shall be registered and associated with the source drawing or view.
+Rasterization shall not replace the authoritative vector or model representation.
+33. DATA PACKAGE EXPORT
+OneDraft shall support structured project-data packages containing multiple related artifacts.
+A package may contain drawings, CAD files, BIM files, schedules, specifications, metadata, manifests and other project deliverables.
+Packages shall maintain internal references between included artifacts.
+Package composition shall be defined through controlled export profiles.
+34. EXPORT MANIFESTS
+Every controlled export shall produce an export manifest.
+The manifest shall identify the Project Model or drawing source, export profile, target format, translator implementation, standards configuration, coordinate system, units and resulting artifacts.
+Source Version: Authoritative project version used for export.
+Export Profile: Configuration governing the export.
+Target Format: Destination representation.
+Translator Version: Implementation responsible for conversion.
+Standards Configuration: Graphic and interoperability standards applied.
+Coordinate Transformation: Transformation applied to the exported representation.
+Artifact Hash: Integrity identifier for the resulting artifact.
+35. ROUND-TRIP EXCHANGE
+Where technically supported, OneDraft shall provide round-trip testing for imported and exported representations.
+Round-trip testing shall evaluate whether information exported from OneDraft and subsequently re-imported remains materially consistent with the originating representation.
+Round-trip equivalence shall be evaluated according to the capabilities and limitations of the external format.
+The system shall distinguish between exact round-trip preservation and controlled semantic equivalence.
+36. EXTERNAL SYSTEM INTEGRATION
+The subsystem shall provide controlled integration boundaries for external systems.
+External integrations may include CAD applications, BIM applications, survey systems, document-management systems, construction platforms, data services and other authorized project-information systems.
+External integrations shall communicate through defined interfaces rather than direct access to internal persistence structures.
+37. API ARCHITECTURE
+The API shall expose controlled resources for external-data operations.
+Representative endpoints shall support:
+POST /projects/{id}/imports
+GET /imports/{id}
+POST /imports/{id}/validate
+POST /imports/{id}/stage
+POST /imports/{id}/incorporate
+POST /projects/{id}/exports
+GET /exports/{id}
+POST /exports/{id}/validate
+GET /artifacts/{id}/manifest
+The final API contract shall remain governed by the established OneDraft API and OpenAPI architecture.
+38. JOB AND WORKER EXECUTION
+Large import and export operations shall execute through the asynchronous job and worker architecture.
+Long-running operations may include CAD parsing, BIM translation, PDF extraction, image processing, document extraction, large data normalization, model comparison and multi-artifact export.
+Jobs shall maintain explicit state.
+Queued: Operation accepted and awaiting execution.
+Running: Processing is active.
+Validation Required: Processing completed but validation remains outstanding.
+Completed: Operation successfully completed.
+Failed: Operation terminated with an unrecoverable error.
+Cancelled: Operation intentionally terminated.
+39. SECURITY
+External data shall be treated as untrusted input.
+Imported files shall be processed through controlled execution boundaries.
+Parsers and translators shall not receive unrestricted access to the OneDraft runtime environment.
+External data shall be prevented from introducing unauthorized executable content into the application environment.
+Access to project imports and exports shall be governed by project authorization and tenant boundaries.
+40. DATA RETENTION
+Original source artifacts shall be retained according to the applicable project and platform retention policy.
+Derived normalized data shall retain references to the originating source where required.
+Superseded imports shall not be silently destroyed where their existence is necessary to maintain project provenance.
+Deletion shall follow the established data lifecycle, retention and provenance architecture.
+41. AUDITABILITY
+Import and export operations shall be auditable.
+Audit records shall identify the initiating actor or process, project, source artifact, operation type, configuration, execution state, resulting artifacts and validation state.
+Changes resulting from external-data incorporation shall remain traceable through the Project Model revision and change-record architecture.
+42. ARIA INTEGRATION
+Aria shall operate as an intelligence and interpretation layer over the external-data subsystem.
+Aria may assist with:
+Document interpretation
+Data classification
+Object mapping
+Specification extraction
+Drawing interpretation
+Conflict identification
+External-data summarization
+Import-profile recommendations
+Export-profile recommendations
+Aria-generated interpretations shall remain distinguishable from deterministic source information.
+Aria shall not silently convert an interpretation into authoritative project information.
+Any command capable of modifying the Project Model shall pass through deterministic command validation and authorization.
+43. AI-ASSISTED EXTRACTION
+AI-assisted extraction may be used when deterministic parsing alone cannot obtain sufficient structured information.
+AI extraction shall produce structured observations with confidence and provenance.
+Extracted observations shall reference their source location where possible.
+Source Reference: Location within the originating artifact.
+Extracted Value: Information identified by the extraction process.
+Confidence: Evaluation associated with the extraction result.
+Extraction Method: Deterministic parser, AI model or combined process.
+Validation State: Current verification state.
+AI-assisted extraction shall not be treated as inherently authoritative.
+44. INTEROPERABILITY VALIDATION
+All controlled external-data operations shall participate in interoperability validation.
+Validation shall verify that the resulting representation conforms to the selected format, profile, coordinate system, unit system and applicable standards.
+Validation shall also detect unsupported objects, information loss and transformation errors.
+An artifact shall not be classified as successfully exchanged solely because a target file was generated.
+45. OBSERVABILITY
+Import and export operations shall emit structured telemetry consistent with the OneDraft observability architecture.
+Telemetry shall capture operation identity, project identity, artifact identity, format, profile, processing duration, artifact size, validation status and failure conditions.
+Large or repeated failures shall be visible to operational monitoring systems.
+46. TESTING
+The subsystem shall be subject to unit, integration, contract, regression, interoperability, round-trip and end-to-end testing.
+Representative source files shall be maintained as controlled test fixtures.
+Testing shall include valid files, malformed files, unsupported files, large files, ambiguous data, coordinate transformations, unit conversions, object mappings and information-loss scenarios.
+Exported artifacts shall be tested against target-format validators where available.
+47. IMPLEMENTATION ARCHITECTURE
+The subsystem shall be implemented through independently testable components.
+The principal components shall include:
+Artifact Intake Service: Registers and stores external source artifacts.
+Format Detection Service: Identifies supported source formats.
+Import Profile Registry: Maintains versioned import configurations.
+Parser Registry: Provides controlled parsers for supported formats.
+Normalization Engine: Converts external information into normalized structures.
+Mapping Engine: Maps external objects and properties into OneDraft classifications.
+Staging Service: Maintains proposed imported information before incorporation.
+Conflict Detection Service: Identifies conflicts between external and authoritative information.
+Change Detection Service: Compares successive external-data versions.
+Export Profile Registry: Maintains versioned export configurations.
+Export Engine: Generates external representations.
+Interoperability Validator: Validates resulting external artifacts.
+Exchange Manifest Service: Produces provenance and integrity records.
+48. DATA MODEL REQUIREMENTS
+The domain architecture shall support external-data entities sufficient to represent the subsystem.
+Representative entities include:
+ExternalArtifact
+ImportOperation
+ImportProfile
+ImportSource
+ImportedObject
+NormalizedObject
+ExternalObjectMapping
+CoordinateReference
+CoordinateTransformation
+UnitMapping
+ImportValidationResult
+ImportConflict
+ImportChange
+ExportOperation
+ExportProfile
+ExportManifest
+ExchangePackage
+TranslationResult
+ExternalReference
+SourceLocation
+These entities shall integrate with the existing Project, Project Model, Artifact, Drawing, Sheet, View, Revision, ChangeRecord and provenance structures.
+49. ARCHITECTURAL INVARIANTS
+The following invariants shall govern the Import, Export & External Data Exchange subsystem.
+Source Preservation: Original external artifacts shall remain identifiable and preserved according to applicable retention policy.
+Project Model Authority: External information shall not automatically replace authoritative OneDraft project information.
+Controlled Incorporation: Imported information shall enter the Project Model only through defined domain operations.
+No Silent Overwrite: Existing authoritative information shall not be silently replaced.
+Provenance: Imported and exported information shall remain traceable to its source or generation context.
+Deterministic Transformation: Coordinate, unit and structural transformations shall be explicit and reproducible.
+No Silent Loss: Unsupported or degraded information shall be identified.
+External Trust Boundary: External files shall be treated as untrusted input.
+AI Separation: AI-generated interpretation shall remain distinguishable from deterministic source information.
+Authorization: Project-changing import operations shall pass through the established authorization and command-verification architecture.
+Format Independence: External formats shall remain exchange representations rather than defining the internal OneDraft domain model.
+50. COMPLETION STATUS
+The Import, Export & External Data Exchange subsystem establishes the controlled external-information boundary of OneDraft.
+The subsystem provides the architecture required to ingest existing project information, normalize and validate external data, preserve source provenance, detect conflicts and changes, incorporate approved information into the Project Model and generate controlled external project artifacts.
+It extends the CAD and BIM interoperability foundation into a broader project-data exchange architecture capable of handling survey information, existing drawings, BIM models, PDFs, images, specifications, schedules, structured data and multi-artifact project packages.
+The subsystem establishes the external data pathway required for OneDraft to operate as a complete project information environment rather than an isolated drafting application.
+Status: ARCHITECTURALLY DEFINED
+Next Document: Frontend & User Interaction Architecture
+Overall Architecture: OneDraft End-to-End System Integration
