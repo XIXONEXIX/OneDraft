@@ -1,0 +1,546 @@
+ONEDRAFT
+CAD-AI — Aria Powered
+Developer Platform, SDK & Extension Architecture
+Version 1.0
+Document: OneDraft Developer Platform, SDK & Extension Architecture Specification
+System: OneDraft CAD-AI
+Intelligence Layer: Aria
+Document Class: Architectural & Implementation Stack Specification
+Status: Architectural Specification
+Predecessor: Disaster Testing, Security Testing & Operational Readiness Architecture Specification
+Successor: Product Configuration & Administrative Control Plane Architecture Specification
+
+1. PURPOSE
+The Developer Platform, SDK & Extension Architecture establishes the supported development interfaces through which developers, organizations and approved external systems may extend, integrate with and automate OneDraft.
+The purpose of this subsystem is to provide stable, governed and versioned mechanisms for interacting with OneDraft without requiring direct access to internal implementation details.
+The architecture shall support Python and TypeScript clients, SDKs, plugins, external integrations, automation, webhooks and future third-party extensions while preserving security, tenant isolation, API contracts and platform integrity.
+2. ARCHITECTURAL ROLE
+The Developer Platform forms the controlled extensibility boundary of OneDraft.
+It connects public APIs, SDKs, developer tooling, plugins, event interfaces and external integrations to the internal OneDraft platform.
+Primary responsibility: Provide supported mechanisms for programmatic interaction and controlled extension.
+Primary inputs: API requests, SDK operations, plugin requests, events, webhooks and integration commands.
+Primary outputs: API responses, SDK objects, events, artifacts, job references and extension results.
+Authority: The Developer Platform shall operate within the API, authorization, tenant, lifecycle and domain contracts established by preceding architectures.
+3. EXTENSION MODEL
+The OneDraft extension architecture shall follow:
+DEVELOPER
+   ↓
+SDK / API / PLUGIN
+   ↓
+API GATEWAY
+   ↓
+AUTHENTICATION
+   ↓
+AUTHORIZATION
+   ↓
+TENANT CONTEXT
+   ↓
+APPLICATION SERVICES
+   ↓
+DOMAIN / COMPUTATIONAL SERVICES
+Extensions shall interact with supported contracts rather than bypassing the application architecture.
+4. DEVELOPER INTERFACES
+Supported developer interfaces shall include:
+REST API
+Python SDK
+TypeScript SDK
+Webhooks
+Event Interfaces
+Plugin Interfaces
+Command Interfaces
+Artifact Interfaces
+Future Extension APIs
+Each interface shall have defined compatibility and security requirements.
+5. API FOUNDATION
+The OneDraft API shall remain the foundational developer interface.
+The API shall expose controlled access to:
+Organizations
+Projects
+Requirements
+Models
+Geometry
+Validation
+Compliance
+Drawings
+Reviews
+Redlines
+Jobs
+Artifacts
+Aria
+Billing
+Integrations
+Only capabilities explicitly included in the public contract shall be externally accessible.
+6. API VERSIONING
+Developer-facing APIs shall be versioned.
+Representative structure:
+/api/v1/...
+Breaking changes shall require controlled version evolution.
+Deprecated endpoints shall have documented retirement policies.
+7. SDK ARCHITECTURE
+SDKs shall provide typed and ergonomic access to the public OneDraft API.
+The SDK architecture shall separate:
+Transport
+Authentication
+Request Construction
+Serialization
+Response Models
+Error Handling
+Retry Handling
+Pagination
+Async Operations
+This separation shall allow SDK implementations to evolve without changing domain semantics.
+8. PYTHON SDK
+The Python SDK shall support Python-based integrations and automation.
+Representative capabilities include:
+Project Management
+Model Operations
+Validation
+Compliance Queries
+Drawing Generation
+Job Monitoring
+Artifact Management
+Aria Commands
+Webhook Handling
+The Python SDK shall use typed domain representations where practical.
+9. TYPESCRIPT SDK
+The TypeScript SDK shall support browser and server-side JavaScript/TypeScript applications.
+It shall provide:
+Typed API Clients
+Domain Models
+Request Builders
+Error Types
+Job Clients
+Artifact Clients
+Event Utilities
+The SDK shall remain compatible with the supported OneDraft frontend architecture.
+10. SDK DOMAIN MODELS
+SDK models shall correspond to stable public domain contracts.
+Representative models include:
+Organization
+User
+Project
+Requirement
+Site
+Building
+Level
+Space
+Element
+ModelVersion
+Revision
+Drawing
+Sheet
+Annotation
+Redline
+Job
+Artifact
+AriaCommand
+SDK models shall not expose unstable internal implementation structures unnecessarily.
+11. AUTHENTICATION
+Developer clients shall authenticate using supported mechanisms.
+These may include:
+OAuth/OIDC
+API Keys
+Service Credentials
+Signed Tokens
+Authentication credentials shall be scoped and revocable.
+SDKs shall not embed platform secrets into distributed client applications.
+12. API KEY MANAGEMENT
+Organization API keys shall be:
+Unique
+Scoped
+Revocable
+Rotatable
+Auditable
+API keys shall be stored securely and shall not be retrievable in plaintext after creation where platform architecture permits.
+13. SERVICE CREDENTIALS
+Server-to-server integrations shall use dedicated service credentials.
+Service credentials shall be separate from individual user credentials.
+Credential lifecycle shall support:
+Creation
+Rotation
+Revocation
+Expiration
+Audit
+14. TENANT ISOLATION
+Developer access shall inherit the Multi-Tenant Organization & Project Isolation architecture.
+Every request shall operate within an authorized organization context.
+External developers shall not obtain cross-organization access by manipulating project or resource identifiers.
+15. PROJECT SCOPING
+API credentials and integrations may be scoped to specific projects.
+A project-scoped credential shall not automatically gain organization-wide access.
+Project scope shall be enforced server-side.
+16. PERMISSION SCOPING
+Developer credentials shall support least-privilege permissions.
+Representative permissions include:
+projects:read
+projects:write
+models:read
+models:write
+drawings:read
+drawings:generate
+artifacts:read
+artifacts:write
+jobs:read
+aria:execute
+Permissions shall correspond to actual OneDraft authorization capabilities.
+17. SDK ERROR MODEL
+SDKs shall provide structured error types.
+Errors shall expose appropriate information such as:
+Error Code
+HTTP Status
+Request Identifier
+Correlation Identifier
+Validation Details
+SDKs shall avoid exposing internal stack traces or sensitive infrastructure information.
+18. RETRY BEHAVIOR
+SDKs may provide controlled retry behavior.
+Retries shall consider:
+HTTP Status
+Idempotency
+Retry-After
+Request Type
+Network Failure
+SDKs shall not automatically retry unsafe mutations without appropriate idempotency protection.
+19. PAGINATION
+Collection APIs shall support deterministic pagination.
+Pagination may use:
+Cursor-Based Pagination
+Offset-Based Pagination
+Cursor-based pagination shall be preferred for large and frequently changing datasets where appropriate.
+20. FILTERING & SORTING
+Public APIs may support controlled filtering and sorting.
+Filters shall be:
+Explicitly Defined
+Validated
+Tenant-Aware
+Resource-Aware
+Clients shall not submit arbitrary database query expressions.
+21. ASYNCHRONOUS SDK OPERATIONS
+SDKs shall provide first-class support for long-running operations.
+Representative workflow:
+CLIENT
+ ↓
+CREATE JOB
+ ↓
+JOB ID
+ ↓
+POLL / EVENT
+ ↓
+COMPLETION
+ ↓
+RESULT
+SDKs may provide both polling and event-driven completion mechanisms.
+22. JOB CLIENT
+The SDK shall provide a common job interface.
+Representative operations:
+Create
+Get
+Cancel
+Retry, where permitted.
+Wait
+Get Result
+Job state shall correspond to the canonical OneDraft job lifecycle.
+23. WEBHOOKS
+OneDraft shall support webhooks for relevant asynchronous events.
+Webhook events may include:
+Project Updated
+Model Version Created
+Validation Completed
+Drawing Generated
+Export Completed
+Job Completed
+Review Submitted
+Artifact Created
+Webhook delivery shall be tenant-scoped.
+24. WEBHOOK SECURITY
+Webhook requests shall use authentication or signing mechanisms.
+The receiver shall be able to verify:
+Event Origin
+Event Integrity
+Event Identifier
+Timestamp
+Delivery Attempt
+Replay protection shall be supported where appropriate.
+25. WEBHOOK DELIVERY
+Webhook delivery shall support:
+Retry
+Backoff
+Dead-Letter Handling
+Delivery Tracking
+Failure Detection
+Webhook consumers shall be responsible for idempotent event handling.
+26. EVENT INTERFACE
+The event architecture shall expose approved domain events to authorized integrations.
+Events shall be versioned.
+Representative structure:
+Event
+ ├── Event ID
+ ├── Event Type
+ ├── Event Version
+ ├── Organization ID
+ ├── Project ID
+ ├── Resource ID
+ ├── Timestamp
+ └── Payload
+Only explicitly public events shall be exposed externally.
+27. PLUGIN ARCHITECTURE
+OneDraft may support controlled plugins.
+Plugins may extend:
+User Interface
+Drawing Tools
+Import Pipelines
+Export Pipelines
+Validation Rules
+Data Integrations
+Project Automation
+Plugins shall execute through defined extension contracts.
+28. PLUGIN ISOLATION
+Plugins shall not receive unrestricted platform access.
+Plugin execution shall be constrained by:
+Permissions
+Tenant Scope
+API Scope
+Resource Scope
+Execution Environment
+Network Policy
+Plugins shall not bypass authorization through internal APIs.
+29. PLUGIN LIFECYCLE
+The plugin lifecycle shall include:
+REGISTER
+   ↓
+VALIDATE
+   ↓
+APPROVE
+   ↓
+INSTALL
+   ↓
+CONFIGURE
+   ↓
+ENABLE
+   ↓
+EXECUTE
+   ↓
+DISABLE
+   ↓
+REMOVE
+Plugin lifecycle operations shall be auditable.
+30. PLUGIN MANIFEST
+Plugins shall provide a manifest describing:
+Plugin Identifier
+Version
+Developer
+Capabilities
+Required Permissions
+Supported API Versions
+Dependencies
+Configuration Requirements
+Entry Points
+The manifest shall be validated before installation.
+31. EXTENSION PERMISSIONS
+Extensions shall declare required permissions before activation.
+Permissions shall follow least privilege.
+A plugin requesting access to unrelated organizational resources shall not be approved automatically.
+32. EXTENSION COMPATIBILITY
+Extensions shall declare supported platform and API versions.
+Compatibility shall be evaluated during:
+Installation
+Upgrade
+Runtime
+Breaking platform changes shall be detectable before an incompatible extension is activated.
+33. EXTENSION VERSIONING
+Plugins and SDKs shall use semantic or equivalent controlled versioning.
+Versions shall identify:
+Major Changes
+Minor Features
+Patch Fixes
+Versioning policy shall remain synchronized with API compatibility.
+34. SDK RELEASE MANAGEMENT
+SDK releases shall be generated and published through the CI/CD architecture.
+Each release shall identify:
+SDK Version
+API Version
+Supported Runtime Versions
+Dependency Versions
+Release Date
+Compatibility Status
+SDK releases shall pass automated tests before publication.
+35. CODE GENERATION
+Where practical, SDK models and clients may be generated from the authoritative OpenAPI specification.
+Generated components shall remain distinguishable from manually maintained implementation code.
+The generated API surface shall be tested against the actual service contract.
+36. CLI
+OneDraft may provide a developer command-line interface.
+Representative commands may include:
+onedraft projects list
+onedraft projects get
+onedraft jobs get
+onedraft jobs wait
+onedraft artifacts download
+onedraft validate
+onedraft export
+onedraft aria execute
+CLI operations shall use the same API and authorization model as SDK clients.
+37. LOCAL DEVELOPMENT
+The Developer Platform shall provide local development support where practical.
+Development tooling may provide:
+Local API
+Test Database
+Mock Services
+Example Projects
+Webhook Receiver
+SDK Fixtures
+CLI
+Local tooling shall not contain production credentials.
+38. SANDBOX ENVIRONMENT
+OneDraft may provide a developer sandbox.
+The sandbox shall provide isolated:
+Organizations
+Projects
+API Credentials
+Artifacts
+Jobs
+Events
+Sandbox data shall remain separate from production data.
+39. TESTING EXTENSIONS
+Developer extensions shall be tested against controlled environments.
+Testing shall include:
+API Compatibility
+Permission Enforcement
+Tenant Isolation
+Webhook Handling
+Failure Handling
+Version Compatibility
+Performance
+Security
+40. EXTERNAL INTEGRATIONS
+External integrations may connect through:
+REST APIs
+SDKs
+Webhooks
+Event Interfaces
+File Exchange
+OAuth/OIDC
+Integrations shall remain explicitly authorized.
+41. INTEGRATION REGISTRY
+OneDraft shall maintain metadata for registered integrations.
+Records may include:
+Integration ID
+Organization
+Developer
+Version
+Permissions
+Credentials
+Status
+Configuration
+Last Activity
+Integration lifecycle changes shall be auditable.
+42. EXTENSION OBSERVABILITY
+Extension execution shall generate appropriate telemetry.
+Metrics may include:
+Invocation Count
+Latency
+Error Rate
+Rate-Limit Events
+Webhook Failures
+Job Failures
+Resource Consumption
+Observability shall preserve tenant boundaries.
+43. EXTENSION RESOURCE LIMITS
+Extensions shall operate within controlled resource limits.
+Limits may apply to:
+CPU
+Memory
+Execution Time
+API Calls
+Storage
+Network Requests
+Concurrent Jobs
+Resource limits shall protect platform availability.
+44. EXTENSION SECURITY
+Extension security shall include:
+Permission Review
+Credential Isolation
+Tenant Isolation
+Input Validation
+Dependency Review
+Code Integrity
+Runtime Isolation
+Audit Logging
+Extensions shall be treated as untrusted or semi-trusted components unless explicitly established otherwise.
+45. DEVELOPER DOCUMENTATION
+The platform shall provide documentation covering:
+API Reference
+SDK Reference
+Authentication
+Authorization
+Webhooks
+Events
+Plugins
+Examples
+Error Handling
+Versioning
+Migration Guides
+Documentation shall correspond to supported API versions.
+46. DEVELOPER SUPPORT
+Developer-facing support mechanisms may include:
+API Status Information
+Documentation
+SDK Issue Reporting
+Integration Diagnostics
+Webhook Delivery Logs
+Migration Guidance
+Support access shall preserve organization and project isolation.
+47. ARCHITECTURAL INVARIANTS
+The following invariants shall govern the Developer Platform, SDK & Extension Architecture.
+API Authority: Public integrations shall use supported API contracts.
+Tenant Isolation: Developer access shall never bypass organization or project boundaries.
+Least Privilege: Extensions shall receive only required permissions.
+Version Control: Public interfaces shall be versioned.
+Compatibility: SDKs and plugins shall declare supported versions.
+Credential Security: Developer credentials shall be protected, scoped and revocable.
+Idempotency: Retryable operations shall preserve domain correctness.
+Auditability: Extension activity shall remain traceable.
+Resource Protection: Extensions shall not exhaust shared platform resources.
+No Internal Bypass: Public extensions shall not rely upon private internal service interfaces.
+Deterministic Domain Control: Extensions shall remain subject to OneDraft domain and validation rules.
+48. IMPLEMENTATION REQUIREMENTS
+The implementation shall provide:
+Public API
+Python SDK
+TypeScript SDK
+Authentication Framework
+Authorization Integration
+API Versioning
+Job Client
+Webhook System
+Event Interface
+Plugin Framework
+Extension Manifest
+Permission Model
+Developer CLI
+Sandbox Support
+Integration Registry
+Developer Documentation
+SDK Release Pipeline
+Extension Testing Framework
+These components shall integrate with the API Gateway, Identity, Authorization, Tenant Isolation, Runtime, Job, Event, Artifact, AI and CI/CD architectures.
+49. EXTENSION ROADMAP
+The initial implementation shall prioritize stable API and SDK capabilities.
+Subsequent extension capabilities may include:
+Advanced Plugins
+Custom Validation Providers
+Custom Drawing Generators
+External BIM Connectors
+Survey Integrations
+Enterprise Automation
+Third-Party Model Providers
+Developer Marketplace
+Future extensions shall remain subordinate to the core OneDraft authorization, validation and security architecture.
+50. COMPLETION STATUS
+The Developer Platform, SDK & Extension Architecture establishes the supported extensibility model for OneDraft.
+The subsystem defines public APIs, Python and TypeScript SDKs, authentication, authorization, tenant scoping, API keys, service credentials, SDK models, error handling, retries, pagination, asynchronous jobs, webhooks, event interfaces, plugins, extension permissions, manifests, compatibility, versioning, CLI tooling, local development, sandbox environments, external integrations, integration registration, extension observability, resource limits, security, developer documentation and extension governance.
+The architecture establishes a controlled development ecosystem through which OneDraft can be automated, integrated and extended without compromising the internal domain model, security boundaries or tenant isolation.
+The next architectural layer establishes the Product Configuration & Administrative Control Plane, defining how platform administrators manage controlled system settings, feature flags, jurisdiction configuration, templates, product behavior and administrative policies.
+Status: ARCHITECTURALLY DEFINED
+Next Document: Product Configuration & Administrative Control Plane Architecture Specification
+Overall Architecture: OneDraft End-to-End System Integration
